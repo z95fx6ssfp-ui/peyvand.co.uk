@@ -1,0 +1,192 @@
+/* peyvand.co.uk global styles. Fonts, reset, base type, themes, focus, reduced motion.
+   Rules come from design.md sections 3, 4, 7 and 8. */
+
+@import "./tokens.css";
+
+/* 1. Fonts, self-hosted from /public/fonts (design.md section 3) */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("/fonts/bricolage-grotesque-latin-wght.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Source Sans 3";
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url("/fonts/source-sans-3-latin-wght.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Source Sans 3";
+  font-style: italic;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url("/fonts/source-sans-3-latin-wght-italic.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Courier Prime";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/courier-prime-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Courier Prime";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/courier-prime-700.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/vazirmatn-arabic-wght.woff2") format("woff2-variations");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/vazirmatn-latin-wght.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* 2. Reset */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--p);
+  line-height: var(--lh-body);
+  text-rendering: optimizeLegibility;
+}
+img, picture, video, canvas, svg { display: block; max-width: 100%; height: auto; }
+input, button, textarea, select { font: inherit; }
+iframe { border: 0; }
+
+/* 3. Themes paint the section they sit on */
+[data-theme] {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* 4. Type (design.md section 3) */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: var(--track-tight);
+  overflow-wrap: anywhere;
+  margin-block: 1.5em 0.5em;
+}
+h1 { font-size: var(--h1); line-height: var(--lh-tight); margin-top: 0; }
+h2 { font-size: var(--h2); line-height: var(--lh-tight); }
+h3 { font-size: var(--h3); line-height: var(--lh-h3); }
+h4 { font-size: var(--h4); line-height: var(--lh-h4); font-weight: 700; letter-spacing: var(--track-h4); }
+
+p, ul, ol, blockquote { margin-block: 0 1em; }
+p, li, blockquote { max-width: var(--measure); }
+.lead { font-size: var(--p-large); }
+small, .small { font-size: var(--p-small); }
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--mono);
+  line-height: var(--lh-mono);
+}
+.mono-caps {
+  text-transform: uppercase;
+  letter-spacing: var(--track-caps);
+}
+
+[lang="fa"] {
+  font-family: var(--font-farsi);
+  direction: rtl;
+}
+
+/* 5. Links: colour plus underline, never colour alone */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-thickness var(--t-fast);
+}
+a:hover, a:focus-visible { text-decoration-thickness: 2px; }
+
+/* 6. Focus ring: 3px, 2px offset, never removed (design.md section 8) */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* 7. Skip link */
+.skip-link {
+  position: absolute;
+  left: var(--gutter);
+  top: -100px;
+  padding: var(--s-3) var(--s-6);
+  background: var(--saffron);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  border-radius: var(--radius);
+  z-index: 100;
+}
+.skip-link:focus { top: var(--s-4); }
+
+/* 8. Layout helpers (design.md section 4) */
+.wrap {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section { padding-block: var(--section-pad); }
+.rule-top { border-top: 1px solid var(--rule); }
+
+/* 9. Buttons */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap);
+  padding: var(--s-3) var(--s-6);
+  font-family: var(--font-display);
+  font-size: var(--button);
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  color: var(--button-fg);
+  background: var(--button-bg);
+  border: 2px solid var(--button-bg);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color var(--t-fast), border-color var(--t-fast);
+}
+.button--secondary {
+  background: transparent;
+  color: var(--fg);
+  border-color: var(--secondary-border);
+}
+
+/* 10. Motion: none by default (design.md section 7) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Two buttons side by side */
+.button + .button { margin-inline-start: var(--s-3); }
