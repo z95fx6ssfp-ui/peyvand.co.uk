@@ -1,0 +1,9 @@
+{
+  // Cloudflare Workers config. The site is fully static, so there is no Worker code:
+  // Cloudflare just serves the built files in dist/. See developers.cloudflare.com/workers/framework-guides/web-apps/astro/
+  "name": "peyvand-co-uk",
+  "compatibility_date": "2026-11-03",
+  "assets": {
+    "directory": "./dist"
+  }
+}
