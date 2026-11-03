@@ -1,0 +1,192 @@
+---
+// Site header. design.md section 5: dark theme, halftone portrait logo at 56px (44px on phones),
+// the name as live text beside it linking home, menu Work · Work with me · Nist · About · Contact.
+// On phones the menu sits behind a "Menu" button (the word, not an icon). Without JavaScript the menu stays open.
+const items = [
+  { href: "/work", label: "Work" },
+  { href: "/work-with-me", label: "Work with me" },
+  { href: "/nist", label: "Nist" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(href + "/");
+---
+
+<header class="site-header" data-theme="dark">
+  <div class="wrap site-header__inner">
+    <a class="site-header__home" href="/">
+      <img
+        class="site-header__logo"
+        src="/images/logo-halftone.png"
+        width="112"
+        height="140"
+        alt="Peyvand Sadeghian"
+      />
+      <span class="site-header__name" aria-hidden="true">Peyvand Sadeghian</span>
+    </a>
+
+    <button
+      class="site-header__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      hidden
+    >Menu</button>
+
+    <nav id="site-nav" class="site-nav" aria-label="Main">
+      <ul class="site-nav__list">
+        {items.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href) ? "page" : undefined}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: relative;
+  }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-6);
+    min-height: 80px;
+    padding-block: var(--s-3);
+  }
+  .site-header__home {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    color: var(--fg);
+    text-decoration: none;
+    min-height: var(--tap);
+  }
+  .site-header__logo {
+    width: 44px;
+    height: auto;
+    border-radius: var(--radius);
+  }
+  .site-header__name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: var(--track-tight);
+    line-height: 1;
+  }
+  .site-header__home:hover .site-header__name,
+  .site-header__home:focus-visible .site-header__name {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  .site-nav__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-6);
+  }
+  .site-nav__list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: var(--fg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--t-fast);
+  }
+  .site-nav__list a:hover,
+  .site-nav__list a:focus-visible {
+    border-bottom-color: var(--link);
+  }
+  .site-nav__list a[aria-current="page"] {
+    border-bottom-color: var(--fg);
+  }
+
+  .site-header__toggle {
+    min-height: var(--tap);
+    min-width: var(--tap);
+    padding: var(--s-2) var(--s-4);
+    background: transparent;
+    color: var(--fg);
+    border: 2px solid var(--fg);
+    border-radius: var(--radius);
+    font-family: var(--font-display);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .site-header__toggle[aria-expanded="true"] {
+    background: var(--fg);
+    color: var(--bg);
+  }
+
+  @media (min-width: 600px) {
+    .site-header__logo { width: 56px; }
+    .site-header__name { font-size: 1.5rem; }
+  }
+
+  /* Phone: the menu becomes a drawer below the bar once JavaScript has run (html.js) */
+  @media (max-width: 899.98px) {
+    :global(html.js) .site-header__toggle { display: inline-flex; align-items: center; }
+    :global(html.js) .site-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      background: var(--bg);
+      border-top: 1px solid var(--fg);
+      border-bottom: 1px solid var(--fg);
+      padding: var(--s-4) var(--gutter) var(--s-6);
+      z-index: 50;
+      transform: translateY(-8px);
+      opacity: 0;
+      visibility: hidden;
+      transition: transform var(--t-drawer), opacity var(--t-drawer), visibility 0s var(--t-drawer);
+    }
+    :global(html.js) .site-nav.is-open {
+      transform: none;
+      opacity: 1;
+      visibility: visible;
+      transition: transform var(--t-drawer), opacity var(--t-drawer);
+    }
+    :global(html.js) .site-nav__list {
+      flex-direction: column;
+      gap: 0;
+    }
+    :global(html.js) .site-nav__list a {
+      width: 100%;
+      font-size: 1.25rem;
+      padding-block: var(--s-2);
+    }
+  }
+</style>
+
+<script>
+  document.documentElement.classList.add("js");
+  const toggle = document.querySelector<HTMLButtonElement>(".site-header__toggle");
+  const nav = document.getElementById("site-nav");
+  if (toggle && nav) {
+    toggle.hidden = false;
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute("aria-expanded", String(open));
+      nav.classList.toggle("is-open", open);
+    };
+    toggle.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>

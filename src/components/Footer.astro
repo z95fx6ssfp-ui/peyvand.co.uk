@@ -1,0 +1,83 @@
+---
+// Site footer. design.md section 5: dark theme, four short columns on desktop, one stack on phones.
+// Contact routes, links as text, stay in touch, access statement and "Last updated" in mono.
+// The newsletter form joins the "Stay in touch" column once a provider is chosen (open question).
+// IMDb joins the links once the profile URL is known.
+const updated = new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+---
+
+<footer class="site-footer rule-top" data-theme="dark">
+  <div class="wrap">
+    <div class="site-footer__grid">
+      <div>
+        <h2 class="site-footer__heading">Acting enquiries</h2>
+        <p class="small">
+          Lucy Middleweek<br />
+          Middleweek Newton Talent Management<br />
+          <a href="tel:+442033940079">020 3394 0079</a><br />
+          <a href="mailto:agents@mntalent.co.uk">agents@mntalent.co.uk</a>
+        </p>
+      </div>
+      <div>
+        <h2 class="site-footer__heading">Everything else</h2>
+        <p class="small"><a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a></p>
+        <p class="small"><a href="/contact">Contact page</a></p>
+      </div>
+      <div>
+        <h2 class="site-footer__heading">Elsewhere</h2>
+        <ul class="site-footer__list small">
+          <li><a href="https://app.spotlight.com/3874-6753-2954">Spotlight</a></li>
+          <li><a href="https://www.instagram.com/peyvandofpersia/">Instagram</a></li>
+          <li><a href="https://www.tiktok.com/@peyvand">TikTok</a></li>
+          <li><a href="https://www.linkedin.com/in/peyvands/">LinkedIn</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="site-footer__heading">Stay in touch</h2>
+        <p class="small">Performances, projects, the occasional postcard. No filler.</p>
+        <!-- Newsletter sign-up form goes here once the provider is decided. -->
+      </div>
+    </div>
+    <p class="mono site-footer__meta">
+      <a href="/access">Access statement</a> · <a href="/privacy-policy">Privacy</a> · Last updated: {updated}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: var(--s-12);
+  }
+  .site-footer__grid {
+    display: grid;
+    gap: var(--s-8) var(--grid-gap);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 600px) {
+    .site-footer__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 900px) {
+    .site-footer__grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  .site-footer__heading {
+    font-size: var(--h4);
+    line-height: var(--lh-h4);
+    font-weight: 700;
+    letter-spacing: var(--track-h4);
+    margin: 0 0 var(--s-3);
+  }
+  .site-footer__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .site-footer__list li { padding-block: var(--s-1); }
+  .site-footer__list a,
+  .site-footer p a {
+    display: inline-block;
+    padding-block: var(--s-1);
+  }
+  .site-footer__meta {
+    margin: var(--s-12) 0 0;
+  }
+</style>
