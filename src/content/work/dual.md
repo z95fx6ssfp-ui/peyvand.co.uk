@@ -3,7 +3,7 @@ title: "DUAL دوگانه"
 year: 2019
 endYear: 2023
 role: ["lead artist", "writer", "performer"]
-medium: ["theatre", "puppetry", "writing"]
+medium: ["theatre", "puppetry", "writing", "animation", "drag", "performance art"]
 setting: ["live"]
 status: produced
 featured: true

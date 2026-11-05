@@ -13,7 +13,7 @@ year: 2025                 # year it first happened
 # role (Maker):     lead artist · co-creator · writer · deviser · director · dramaturg · puppet maker
 #   actor = a character in someone else's production; performer = performing in devised, live art or your own work
 role: ["actor"]
-# medium: theatre · installation · puppetry · stop-motion · film · television · audio · writing
+# medium: theatre · installation · puppetry · animation · film · television · audio · writing · drag · performance art
 medium: ["theatre"]
 # setting: live · recorded · outdoor · online · gallery   (a filmed show takes both live and recorded)
 setting: ["live"]

@@ -21,11 +21,13 @@ export const MEDIA = [
   "theatre",
   "installation",
   "puppetry",
-  "stop-motion",
+  "animation",
   "film",
   "television",
   "audio",
   "writing",
+  "drag",
+  "performance art",
 ] as const;
 
 export const SETTINGS = ["live", "recorded", "outdoor", "online", "gallery"] as const;
