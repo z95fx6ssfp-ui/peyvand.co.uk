@@ -9,6 +9,8 @@ featured: true
 with: "Matthew Robinson"
 venue: "The Pit, Barbican Centre (CRIPtic Arts: The Acts); APT Gallery, London"
 company: "CRIPtic Arts Launchpad commission"
+image: "../../assets/work/placeholder.png"
+imageAlt: ""
 summary: "A performance-installation that takes NASA's Apollo 11 archive apart and puts our own archives inside it. Mission transcripts, live video and old broadcast tech, read through a neurodivergent lens."
 links:
   - label: "Watch the trailer on Vimeo"

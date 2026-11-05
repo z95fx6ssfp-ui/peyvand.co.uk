@@ -4,6 +4,7 @@
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import FactsLine from "../../components/FactsLine.astro";
+import { Image } from "astro:assets";
 
 const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.data.year);
 ---
@@ -17,6 +18,11 @@ const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.dat
         <ul class="work-list">
           {entries.map((entry) => (
             <li>
+              {entry.data.image && (
+                <a href={`/work/${entry.id}/`} tabindex="-1" aria-hidden="true">
+                  <Image src={entry.data.image} alt="" widths={[480, 800]} sizes="(min-width: 600px) 480px, 100vw" class="thumb" />
+                </a>
+              )}
               <h2><a href={`/work/${entry.id}/`}>{entry.data.title}</a></h2>
               <FactsLine data={entry.data} />
               <p>{entry.data.summary}</p>
@@ -32,4 +38,5 @@ const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.dat
   .work-list { list-style: none; padding: 0; margin: var(--s-8) 0 0; max-width: var(--measure); }
   .work-list li + li { margin-top: var(--s-8); padding-top: var(--s-8); border-top: 1px solid var(--rule); }
   .work-list h2 { margin: 0 0 var(--s-2); }
+  .thumb { display: block; width: 100%; max-width: 480px; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid var(--ink); margin-bottom: var(--s-4); }
 </style>

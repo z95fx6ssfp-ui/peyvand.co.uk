@@ -10,6 +10,8 @@ featured: true
 venue: "Vault Festival, HOME Manchester, Pleasance Dome (Edinburgh Fringe), UK tour"
 company: "Co-commissioned by Camden People's Theatre and HOME"
 director: "Nastazja Domaradzka"
+image: "../../assets/work/placeholder.png"
+imageAlt: ""
 summary: "Autobiographical agitprop about holding two passports. One woman, two names, one childhood trip to Iran that did not end on time. Puppetry, drag and a mega-mix of chanting and dancing."
 links:
   - label: "Watch the trailer on Vimeo"

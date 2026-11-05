@@ -3,6 +3,7 @@
 import { getCollection, render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import FactsLine from "../../components/FactsLine.astro";
+import { Image } from "astro:assets";
 
 export async function getStaticPaths() {
   const entries = await getCollection("work");
@@ -25,6 +26,12 @@ const connected = entry.data.connected
           <p class="mono"><a href="/work/">Work</a></p>
           <h1>{entry.data.title}</h1>
           <FactsLine data={entry.data} />
+          {entry.data.image && (
+            <figure class="hero">
+              <Image src={entry.data.image} alt={entry.data.imageAlt ?? ""} widths={[480, 800, 1200]} sizes="(min-width: 1024px) 1200px, 100vw" />
+              {entry.data.photographer && <figcaption class="mono">Photo: {entry.data.photographer}</figcaption>}
+            </figure>
+          )}
           <p class="lead">{entry.data.summary}</p>
           <div class="prose">
             <Content />
@@ -59,6 +66,9 @@ const connected = entry.data.connected
 
 <style>
   .prose, .lead { max-width: var(--measure); }
+  .hero { margin: 0 0 var(--s-8); }
+  .hero img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid var(--ink); }
+  .hero figcaption { margin-top: var(--s-2); }
   .links { list-style: none; padding: 0; margin: var(--s-8) 0 0; }
   .links li + li { margin-top: var(--s-2); }
   .connected { list-style: none; padding: 0; margin: var(--s-4) 0 0; }

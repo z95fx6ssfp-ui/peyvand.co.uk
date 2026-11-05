@@ -8,6 +8,8 @@ status: produced
 featured: true
 venue: "LCB Depot, Leicester, for Journeys Festival International"
 company: "Commissioned by Art Reach"
+image: "../../assets/work/placeholder.png"
+imageAlt: ""
 summary: "A wooden sound installation drawing on the pigeon towers of Esfahan. Inside, sounds recorded with Leicester community groups, copied and re-copied until only a trace is left."
 links: []
 connected: ["dual"]
