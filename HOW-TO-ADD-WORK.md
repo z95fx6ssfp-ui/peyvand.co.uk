@@ -1,8 +1,10 @@
 # How to add or change a Work entry
 
-Every project on the Work page is one text file in `src/content/work/`. Change the file and the site rebuilds itself within a few minutes of the change reaching GitHub.
+The master list of projects lives in Notion, in the database "Website: Work" (https://app.notion.com/p/5b102617b3e54cb7b5340c464558a82e). One page per project, with the photo, the tags and the page text. Set a page's Website property to "Ready to publish" and tell Claude "sync the website": Claude reads the Notion pages, writes the files in `src/content/work/`, copies the images into `src/assets/work/`, pushes, and marks the page Published. The Notion page "Website content: how it works" has the full routine.
 
-## Three ways to do it, pick whichever suits the moment
+The files in this repo are generated from Notion. Editing them directly still works, but the next sync overwrites them, so put the change in Notion instead.
+
+## Other ways in, for when Notion is not to hand
 
 1. **Send the material to Claude in Cowork.** Paste text, a programme note, a press release, a voice-note transcript, links, and attach the photo. Say which project it is. Claude fills in the template, shows you the page, commits and pushes. Best for new entries.
 
