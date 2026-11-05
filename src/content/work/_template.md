@@ -1,7 +1,7 @@
 ---
 # ONE PROJECT = ONE FILE. Copy this file, rename it to the project's web address
 # (lower case, hyphens, e.g. toto-kerblammo.md) and fill in the fields.
-# Files starting with an underscore are ignored by the build, so this template is safe here.
+# Files starting with an underscore are excluded from the site, so this template is safe here.
 # Lines starting with # are notes to you and can be deleted.
 
 title: "Project title"

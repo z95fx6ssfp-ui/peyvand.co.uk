@@ -35,7 +35,8 @@ export const STATUSES = ["R&D", "in development", "produced", "touring", "archiv
 const roleValues = [...ROLES.Performer, ...ROLES.Maker] as const;
 
 const work = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./src/content/work" }),
+  // Files starting with an underscore (the template) are not entries.
+  loader: glob({ pattern: ["**/*.md", "!**/_*"], base: "./src/content/work" }),
   schema: ({ image }) =>
     z.object({
       title: z.string(),

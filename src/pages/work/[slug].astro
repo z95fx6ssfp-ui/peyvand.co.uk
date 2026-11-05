@@ -28,7 +28,7 @@ const connected = entry.data.connected
           <FactsLine data={entry.data} />
           {entry.data.image && (
             <figure class="hero">
-              <Image src={entry.data.image} alt={entry.data.imageAlt ?? ""} widths={[480, 800, 1200]} sizes="(min-width: 1024px) 1200px, 100vw" />
+              <Image src={entry.data.image} alt={entry.data.imageAlt ?? ""} widths={[480, 800, 1200]} sizes="(min-width: 1024px) 1200px, 100vw" loading="eager" />
               {entry.data.photographer && <figcaption class="mono">Photo: {entry.data.photographer}</figcaption>}
             </figure>
           )}
