@@ -1,0 +1,66 @@
+---
+// One page per Work entry.
+import { getCollection, render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import FactsLine from "../../components/FactsLine.astro";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("work");
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const all = await getCollection("work");
+const connected = entry.data.connected
+  .map((id) => all.find((e) => e.id === id))
+  .filter(Boolean);
+---
+
+<Base title={`${entry.data.title} · Peyvand Sadeghian`} description={entry.data.summary}>
+  <main id="main">
+    <article>
+      <section data-theme="light" class="section">
+        <div class="wrap">
+          <p class="mono"><a href="/work/">Work</a></p>
+          <h1>{entry.data.title}</h1>
+          <FactsLine data={entry.data} />
+          <p class="lead">{entry.data.summary}</p>
+          <div class="prose">
+            <Content />
+          </div>
+          {entry.data.links.length > 0 && (
+            <ul class="links mono">
+              {entry.data.links.map((l) => (
+                <li><a href={l.url} rel="noopener">{l.label}</a></li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+      {connected.length > 0 && (
+        <section data-theme="quiet" class="section">
+          <div class="wrap">
+            <h2>Connected work</h2>
+            <ul class="connected">
+              {connected.map((c) => (
+                <li>
+                  <a href={`/work/${c.id}/`}>{c.data.title}</a>
+                  <FactsLine data={c.data} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+    </article>
+  </main>
+</Base>
+
+<style>
+  .prose, .lead { max-width: var(--measure); }
+  .links { list-style: none; padding: 0; margin: var(--s-8) 0 0; }
+  .links li + li { margin-top: var(--s-2); }
+  .connected { list-style: none; padding: 0; margin: var(--s-4) 0 0; }
+  .connected li + li { margin-top: var(--s-4); }
+</style>

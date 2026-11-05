@@ -1,0 +1,39 @@
+---
+// Facts line (design.md section 3 and 5): mono, assembled from the entry's fields,
+// never typed by hand. Middle dots may wrap onto a second line on phones.
+interface Props {
+  data: {
+    year: number;
+    endYear?: number;
+    medium: readonly string[];
+    role: readonly string[];
+    venue?: string;
+    company?: string;
+    with?: string;
+    character?: string;
+    producedByNist?: boolean;
+    status?: string;
+  };
+}
+const { data } = Astro.props;
+const years = data.endYear && data.endYear !== data.year ? `${data.year} to ${data.endYear}` : String(data.year);
+const parts: string[] = [years, data.medium.join(", "), data.role.join(", ")];
+if (data.character) parts.push(`as ${data.character}`);
+if (data.venue) parts.push(data.venue);
+if (data.with) parts.push(`with ${data.with}`);
+if (data.company) parts.push(data.company);
+---
+
+<p class="facts mono">
+  {parts.map((part, i) => (
+    <>{i > 0 && <span class="dot" aria-hidden="true"> · </span>}<span>{part}</span></>
+  ))}
+  {data.producedByNist && <><span class="dot" aria-hidden="true"> · </span><span class="nist">Produced by Nist</span></>}
+  {data.status && data.status !== "produced" && <><span class="dot" aria-hidden="true"> · </span><span class="status">{data.status}</span></>}
+</p>
+
+<style>
+  .facts { margin: 0 0 var(--s-4); }
+  .nist { color: var(--pomegranate); }
+  .status { text-transform: uppercase; letter-spacing: var(--track-caps); }
+</style>

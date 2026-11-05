@@ -1,0 +1,35 @@
+---
+// Work index: first pass. One list of every entry, newest first.
+// The curated row, Card component and filter UI come in the next stage.
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import FactsLine from "../../components/FactsLine.astro";
+
+const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.data.year);
+---
+
+<Base title="Work · Peyvand Sadeghian" description="Performance, installation, puppetry, film and writing by Peyvand Sadeghian.">
+  <main id="main">
+    <section data-theme="light" class="section">
+      <div class="wrap">
+        <h1>Work</h1>
+        <p class="lead">Stage, screen, installation, puppetry, film and writing, newest first.</p>
+        <ul class="work-list">
+          {entries.map((entry) => (
+            <li>
+              <h2><a href={`/work/${entry.id}/`}>{entry.data.title}</a></h2>
+              <FactsLine data={entry.data} />
+              <p>{entry.data.summary}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .work-list { list-style: none; padding: 0; margin: var(--s-8) 0 0; max-width: var(--measure); }
+  .work-list li + li { margin-top: var(--s-8); padding-top: var(--s-8); border-top: 1px solid var(--rule); }
+  .work-list h2 { margin: 0 0 var(--s-2); }
+</style>
