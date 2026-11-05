@@ -1,15 +1,16 @@
 ---
 title: "DUAL دوگانه"
 year: 2019
-endYear: 2024
-role: ["lead artist", "writer", "performer", "puppeteer"]
-medium: ["theatre", "puppetry"]
+endYear: 2023
+role: ["lead artist", "writer", "performer"]
+medium: ["theatre", "puppetry", "writing"]
 setting: ["live"]
 status: produced
 featured: true
-venue: "Vault Festival, HOME Manchester, Pleasance Dome (Edinburgh Fringe), UK tour"
+venue: "Vault Festival 2020, UK tour 2023: Pleasance Dome (Edinburgh Fringe), HOME Manchester, Camden People's Theatre London"
 company: "Co-commissioned by Camden People's Theatre and HOME"
 director: "Nastazja Domaradzka"
+photographer: "Ali Wright"
 image: "../../assets/work/placeholder.png"
 imageAlt: ""
 summary: "Autobiographical agitprop about holding two passports. One woman, two names, one childhood trip to Iran that did not end on time. Puppetry, drag and a mega-mix of chanting and dancing."
@@ -20,7 +21,7 @@ links:
     url: "https://www.bigissue.com/culture/theatre/i-exist-as-two-people-peyvand-sadeghian-lays-bare-the-politics-of-identity/"
   - label: "The Stage review"
     url: "https://www.thestage.co.uk/reviews/dual-review-at-pleasance-dome-edinburgh"
-connected: ["apolune-systems-normal"]
+connected: ["apolune-systems-normal", "pigeon-tower"]
 ---
 
 Peyvand is British. Parisa is Iranian. One woman, two passports, two names.
