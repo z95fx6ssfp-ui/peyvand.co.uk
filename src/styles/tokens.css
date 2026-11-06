@@ -32,7 +32,7 @@
   --p-small: 1rem;
   --button: 1rem;
   --mono: 0.9rem;
-  --display: clamp(3rem, 10vw, 8rem); /* entry titles and straplines, design.md section 4 */
+  --display: clamp(2.25rem, 9vw, 8rem); /* entry titles and straplines, design.md section 4 */
 
   --lh-tight: 1.05;
   --lh-h3: 1.1;
