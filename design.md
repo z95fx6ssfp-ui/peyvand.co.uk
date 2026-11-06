@@ -1,12 +1,14 @@
 # peyvand.co.uk: design.md
 
-Design tokens and rules for the Astro build. Decided 29 Oct 2026 (Direction C, "the archive", type pairing 2), written up 3 Nov 2026. Everything here is the reference for `src/styles/tokens.css` and for every layout decision. When something here and the build disagree, fix the build.
+Design tokens and rules for the Astro build. Decided 29 Oct 2026 (Direction C, "the archive", type pairing 2), written up 3 Nov 2026. Layout rules rewritten 6 Nov 2026 after Peyvand saw the first built pages and found them boring next to the old Squarespace DUAL page: colour and images now carry the structure of every page (sections 1, 2, 4, 5 and 6 changed; tokens, type, motion and accessibility unchanged). Everything here is the reference for `src/styles/tokens.css` and for every layout decision. When something here and the build disagree, fix the build.
 
 Sources: Design canvas "peyvand.co.uk visual direction", Nist brand guide ("Nist Ltd: Brand Identity & Strategy Guide" and the "Nist colours" sheet), Squarespace Site Styles set on 29 Oct, and `claude/rebuild-progress.md`.
 
 ## 1. The idea in one paragraph
 
-The site looks like a working archive: paper, ink, typewritten facts, a stamp of colour where something matters. It borrows from photocopied zines, passport and permit paperwork, rehearsal-room notices and contact sheets. The existing halftone portrait logo already sits in that world. Colour is scarce and does a job each time it appears. Type is big, dark and confident for headings, plain and readable for everything else. Nothing moves unless the visitor asks it to.
+The site looks like a poster wall made from a working archive: photographs printed edge to edge, slabs of saffron and pomegranate, typewritten facts, titles set enormous. It borrows from photocopied zines, passport and permit paperwork, rehearsal-room notices and contact sheets, at poster scale rather than filing-card scale. The existing halftone portrait logo already sits in that world. Colour is structural: whole sections are Saffron, Pomegranate or Ink, and Paper is the rest between them, not the default everything sits on. Type is big, dark and confident for headings, plain and readable for everything else. Nothing moves unless the visitor asks it to.
+
+What this replaces (6 Nov 2026): the first draft said "colour is scarce", "one Pomegranate accent per screen", and "sections are separated by padding, not colour". Built to the letter, that gave a page that read as a CV entry. Those three rules are withdrawn.
 
 ## 2. Colour
 
@@ -16,9 +18,9 @@ Six colours. Four names come from Peyvand's palette, two are quiet supports.
 | --- | --- | --- | --- |
 | `--ink` | Ink (Nist Absence Black) | `#1A1A1A` | All body text, headings, borders, dark sections |
 | `--paper` | Paper | `#F1ECE2` | Default page background, text on dark sections |
-| `--saffron` | Saffron (Nist Zine Yellow) | `#FFD700` | Fill only: primary buttons, highlights, link colour on dark sections |
+| `--saffron` | Saffron (Nist Zine Yellow) | `#FFD700` | Whole sections (body copy, galleries), primary buttons, link colour on dark sections. Never text on Paper |
 | `--firoozeh` | Firoozeh (Nist Teal Flux, deepened) | `#0B6B6B` | Links and labels on light sections, focus ring |
-| `--pomegranate` | Pomegranate | `#9E2A3C` | Stamp red: thread tags, "Produced by Nist" lines, one accent per screen at most |
+| `--pomegranate` | Pomegranate | `#9E2A3C` | Whole sections (quote walls), thread tags, "Produced by Nist" lines, titles on Saffron |
 | `--rose` | Rose | `#F4DEE6` | Background for quiet blocks: quotes, access notes, asides |
 
 Firoozeh is the Nist Teal Flux `#008080` darkened so it reads as text on Paper at AA. Pomegranate is not in either Nist brand document; it was added for the stamp role and Peyvand has not objected to it, but it is not confirmed. If it goes, thread tags and Produced by Nist lines fall back to Ink on Rose.
@@ -37,6 +39,10 @@ Firoozeh is the Nist Teal Flux `#008080` darkened so it reads as text on Paper a
 | Paper on Ink | 14.8:1 | Text on dark sections, header, footer |
 | Saffron on Ink | 12.4:1 | Links and buttons on dark sections |
 | Paper on Firoozeh | 5.4:1 | Filled teal block, if ever used |
+| Paper on Pomegranate | 6.3:1 | Text on `pomegranate` sections |
+| Saffron on Pomegranate | 5.3:1 | Second text colour on `pomegranate` sections, display sizes |
+| Pomegranate on Saffron | 5.3:1 | Titles and straplines on `saffron` sections |
+| Firoozeh on Saffron | 4.5:1 | Links on `saffron` sections, borderline: underline always, prefer Ink underlined |
 | Firoozeh on Ink | 2.8:1 | FAILS. Never use teal text on dark sections; links there are Saffron |
 | Saffron on Paper | 1.2:1 | FAILS. Saffron is never text, never a thin rule on Paper |
 
@@ -44,15 +50,17 @@ Rule: 4.5:1 minimum for all text, 3:1 for icons, borders and focus rings. The ta
 
 ### Section themes
 
-Three themes, each a set of CSS custom properties switched on a `<section>` by a `data-theme` attribute, so components never pick colours themselves.
+Five themes, each a set of CSS custom properties switched on a `<section>` by a `data-theme` attribute, so components never pick colours themselves.
 
 | Theme | Background | Text | Links | Button |
 | --- | --- | --- | --- | --- |
 | `light` (default) | Paper | Ink | Firoozeh | Saffron fill, Ink label |
 | `quiet` | Rose | Ink | Firoozeh | Saffron fill, Ink label |
 | `dark` | Ink | Paper | Saffron | Saffron fill, Ink label |
+| `saffron` | Saffron | Ink | Ink, underlined | Ink fill, Saffron label |
+| `pomegranate` | Pomegranate | Paper | Paper, underlined | Saffron fill, Ink label |
 
-Header and footer are `dark`. Page bodies are `light` with `quiet` blocks for quotes, access information and asides. Avoid two `dark` sections touching.
+Header and footer are `dark`. A page is a stack of full-bleed sections and the theme changes at every section edge: a hero photograph, then `pomegranate`, then `saffron`, then `dark`, then `light`, and so on. No two neighbouring sections share a theme, and `light` is one slab among the others rather than the page's resting state. Long prose sits on `saffron` or `light`; quotes sit on `pomegranate` or `dark`; galleries sit on `saffron`; practical lists (credits, press, connected work) sit on `light` or `quiet`. Avoid two `dark` sections touching, and avoid `dark` straight after a dark-toned photograph unless the photograph fades into it.
 
 ### The Nist page exception
 
@@ -103,13 +111,15 @@ Measure: body text maximum 68 characters a line (`max-width: 68ch`). Headings ma
 
 Spacing scale on a 4px base: `--s-1` 4px, `--s-2` 8px, `--s-3` 12px, `--s-4` 16px, `--s-6` 24px, `--s-8` 32px, `--s-12` 48px, `--s-16` 64px, `--s-24` 96px.
 
-- Page gutter 16px under 600px, 24px to 1024px, then a centred column with `max-width: 1200px`. Text columns cap at 68ch inside it.
-- Section padding `--s-12` on phones, `--s-24` on desktop. Sections are separated by padding and theme changes, not rules, except one 1px Ink rule above the footer.
+- Every section is full-bleed: its background runs edge to edge of the viewport. Inside it, a centred column with `max-width: 1200px` and a gutter of 16px under 600px, 24px to 1024px. Text columns cap at 68ch inside it; headings, quotes and galleries use the full column.
+- Section padding `--s-12` on phones, `--s-24` on desktop. Sections are separated by their colour change, not rules, except one 1px Ink rule above the footer.
+- Display sizes for entry titles and straplines: `clamp(3rem, 10vw, 8rem)`, line height 0.95, weight 800. The title is the biggest thing on the page.
+- Photographs are shown large: an entry hero is full-bleed and 60 to 80vh tall; gallery tiles are at least a third of the column wide on desktop.
 - Grid: 12 columns on desktop with `--s-6` gaps; 2 columns from 600px to 900px; 1 column under 600px. Cards keep the same shape at every width.
 - Tap targets at least 44 by 44px. Buttons have 12px vertical and 24px horizontal padding, 2px corner radius, no shadow.
 - Corner radius is 2px everywhere, or 0. Nothing is pill-shaped or rounded enough to look like an app.
 
-What happens on mobile, as a rule: everything stacks to one column in document order, images go above their text, the menu becomes a drawer behind a "Menu" button with the word visible (not an icon alone), and the facts line is allowed to wrap onto two lines with the middle dots left in place.
+What happens on mobile, as a rule: everything stacks to one column in document order, images go above their text, the menu becomes a drawer behind a "Menu" button with the word visible (not an icon alone), and the facts line is allowed to wrap onto two lines with the middle dots left in place. Full-bleed colour sections stay full-bleed; the hero drops to about 70vh with the title still over it; the quote wall keeps its mixed sizes but the largest line shrinks with `clamp`; galleries go to two columns.
 
 ## 5. Components
 
@@ -120,17 +130,22 @@ The build should have exactly these, each a single Astro component, each taking 
 - **Thread tag**: mono caps, Pomegranate text on a 1px Pomegranate border, 2px radius, 4px by 8px padding. Up to two per entry.
 - **Produced by Nist line**: mono, Pomegranate, with the Nist logo at 20px to its left. Only where true.
 - **Button**: display 700 at 1rem, Saffron fill, Ink label, 2px radius; secondary button is a 2px Ink border with Ink label and transparent fill. On dark sections the secondary border is Paper.
+- **Entry hero**: the entry's main photograph full-bleed, 60 to 80vh, `object-fit: cover`, with an Ink gradient rising from the bottom third and the title set at display size in Saffron over it (Saffron on Ink 12.4:1; the gradient is opaque Ink where the text sits). A Farsi part of a title sits beside or under the Latin part in Vazirmatn at the same size. Facts line in Paper mono under the title. Photographer credit in mono at the bottom right. Without a photograph the hero is a `saffron` block with the title in Pomegranate.
+- **Quote wall**: a `pomegranate` (or `dark`) section holding short audience and press quotes in the display face at three sizes (`clamp` from 1.5rem to 5rem), in Paper and Saffron, laid out as a flowing cloud with `flex-wrap` and uneven gaps so it reads as a poster, not a list. Each quote is a `<blockquote>` or `<q>` with its source in mono; audience quotes may be unattributed as a group ("From the audience"). Reading order in the DOM is the order a screen reader gets; the visual scatter is CSS only.
+- **Strapline block**: a `saffron` section opening with one line at display size in Pomegranate (for DUAL, "Autobiographical agitprop.") followed by the lead paragraph and the body prose in Ink at 68ch.
+- **Gallery**: a grid of photographs on a `saffron` section, three columns on desktop, two on phones, mixed portrait and landscape allowed with `grid-auto-flow: dense`; each image a `<figure>` with its own alt text, photographer in the section's caption line. No lightbox, no carousel.
 - **Card** (Work grid): image at 3:2, cropped with `object-fit: cover`, 1px Ink border, title in H3 below, facts line under it. Whole card is the link, one focus ring around it.
 - **Quiet block**: Rose background, `--s-6` padding, used for quotes, access notes, content notes.
 - **Stamp**: a Pomegranate rotated label (minus 3 degrees) for one-word states such as "Touring", "New", "Archive". At most one per screen. Rotation is purely decorative and removed when `prefers-reduced-motion` is set, since the tilt alone does not move but the convention keeps everything calm.
 - **Figure**: image with mono caption below carrying the description and the photographer credit, "Photo: Ali Wright".
-- **Video embed**: Vimeo or YouTube iframe at 16:9 inside a Paper frame, `loading="lazy"`, captions on by default, autoplay off, a visible title above it and a plain link below ("Watch on Vimeo") for anyone who blocks embeds.
+- **Video embed**: Vimeo or YouTube iframe at 16:9 on a `dark` section, the full column wide, `loading="lazy"`, captions on by default, autoplay off, a visible title above it and a plain link below ("Watch on Vimeo") for anyone who blocks embeds. On an entry page it comes straight after the hero, not at the end.
 - **Footer**: dark theme, four short columns on desktop and one stack on phones: contact routes, links (Spotlight, IMDb, Instagram, TikTok, LinkedIn as text), newsletter, Access statement and "Last updated: Month Year" in mono.
 
 ## 6. Imagery and texture
 
-- Photographs are the colour in this site. They are shown without filters, duotones or tints.
-- Where there is no photograph, the fallback is Paper with a mono caption, never a stock image or a decorative illustration.
+- Photographs and the three strong colours share the job of making the site vivid. Photographs are shown large and without filters, duotones or tints; the only thing laid over one is the hero gradient that carries the title.
+- Where there is no photograph, the fallback is a `saffron` block with the title in Pomegranate and a mono caption, never a stock image or a decorative illustration.
+- Project artwork (posters, logos, flyers, zine pages, envelopes) counts as imagery and goes in the gallery alongside production photographs.
 - One texture is allowed: a faint paper grain on `dark` sections, as a small tiled PNG under 20KB at 4 to 6 per cent opacity, and a halftone treatment for the logo only. No grain over text on light sections.
 - The halftone portrait logo is the only halftone image on the site.
 - Image sizes: content images exported at 1600px wide maximum, cards at 800px, served as AVIF with JPEG fallback through Astro's `<Image>` component, which also sets width and height so nothing jumps while loading.

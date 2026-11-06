@@ -64,6 +64,23 @@ const work = defineCollection({
       links: z
         .array(z.object({ label: z.string(), url: z.string().url() }))
         .default([]),
+      // Added 6 Nov 2026 for the bold entry template (design.md section 5).
+      video: z.string().url().optional(), // Vimeo or YouTube page URL; embedded after the hero
+      videoTitle: z.string().optional(), // visible title above the embed, e.g. "Trailer"
+      strapline: z.string().max(60).optional(), // one line at display size, e.g. "Autobiographical agitprop."
+      audienceQuotes: z.array(z.string()).default([]), // short, unattributed, shown as a wall
+      pressQuotes: z
+        .array(z.object({ quote: z.string(), source: z.string() }))
+        .default([]),
+      gallery: z
+        .array(
+          z.object({
+            image: image(),
+            alt: z.string(),
+            photographer: z.string().optional(),
+          }),
+        )
+        .default([]),
       connected: z.array(z.string()).default([]), // slugs of related work
     }),
 });

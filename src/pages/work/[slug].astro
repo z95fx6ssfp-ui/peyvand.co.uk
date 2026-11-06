@@ -1,8 +1,12 @@
 ---
-// One page per Work entry.
+// One page per Work entry. Bold template, 6 Nov 2026 (design.md sections 4 and 5):
+// hero photograph with the title over it, trailer, quote wall, strapline and prose on
+// Saffron, press quotes on Ink, gallery on Saffron, credits and links on Paper,
+// connected work on Rose. Sections that have no content are left out.
 import { getCollection, render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import FactsLine from "../../components/FactsLine.astro";
+import VideoEmbed from "../../components/VideoEmbed.astro";
 import { Image } from "astro:assets";
 
 export async function getStaticPaths() {
@@ -11,40 +15,139 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const d = entry.data;
+const { Content, headings } = await render(entry);
 const all = await getCollection("work");
-const connected = entry.data.connected
-  .map((id) => all.find((e) => e.id === id))
-  .filter(Boolean);
+const connected = d.connected.map((id) => all.find((e) => e.id === id)).filter(Boolean);
+
+// Split a title such as "DUAL دوگانه" into its Latin and Farsi parts so the Farsi
+// gets lang="fa" and the right face (design.md section 8).
+const farsi = d.title.match(/[؀-ۿ][؀-ۿ\s‌]*/);
+const latin = farsi ? d.title.replace(farsi[0], "").trim() : d.title;
+const hasBody = headings.length > 0 || entry.body?.trim();
 ---
 
-<Base title={`${entry.data.title} · Peyvand Sadeghian`} description={entry.data.summary}>
+<Base title={`${d.title} · Peyvand Sadeghian`} description={d.summary}>
   <main id="main">
     <article>
-      <section data-theme="light" class="section">
-        <div class="wrap">
-          <p class="mono"><a href="/work/">Work</a></p>
-          <h1>{entry.data.title}</h1>
-          <FactsLine data={entry.data} />
-          {entry.data.image && (
-            <figure class="hero">
-              <Image src={entry.data.image} alt={entry.data.imageAlt ?? ""} widths={[480, 800, 1200]} sizes="(min-width: 1024px) 1200px, 100vw" loading="eager" />
-              {entry.data.photographer && <figcaption class="mono">Photo: {entry.data.photographer}</figcaption>}
-            </figure>
-          )}
-          <p class="lead">{entry.data.summary}</p>
-          <div class="prose">
-            <Content />
+      {/* 1. Hero */}
+      {d.image ? (
+        <section class="hero" data-theme="dark">
+          <Image class="hero-img" src={d.image} alt={d.imageAlt ?? ""} widths={[800, 1200, 1600, 2400]} sizes="100vw" loading="eager" fetchpriority="high" />
+          <div class="hero-text">
+            <div class="wrap">
+              <p class="mono crumb"><a href="/work/">Work</a></p>
+              <h1 class="display">
+                <span>{latin}</span>
+                {farsi && <span lang="fa" dir="rtl">{farsi[0].trim()}</span>}
+              </h1>
+              <FactsLine data={d} />
+              {d.photographer && <p class="mono credit">Photo: {d.photographer}</p>}
+            </div>
           </div>
-          {entry.data.links.length > 0 && (
-            <ul class="links mono">
-              {entry.data.links.map((l) => (
-                <li><a href={l.url} rel="noopener">{l.label}</a></li>
+        </section>
+      ) : (
+        <section class="hero hero--plain" data-theme="saffron">
+          <div class="wrap">
+            <p class="mono crumb"><a href="/work/">Work</a></p>
+            <h1 class="display accent">
+              <span>{latin}</span>
+              {farsi && <span lang="fa" dir="rtl">{farsi[0].trim()}</span>}
+            </h1>
+            <FactsLine data={d} />
+          </div>
+        </section>
+      )}
+
+      {/* 2. Video, straight after the hero */}
+      {d.video && (
+        <section data-theme="dark" class="section">
+          <div class="wrap">
+            <VideoEmbed url={d.video} title={`${d.videoTitle ?? "Video"}: ${d.title}`} heading={d.videoTitle ?? "Watch"} />
+          </div>
+        </section>
+      )}
+
+      {/* 3. Audience quote wall */}
+      {d.audienceQuotes.length > 0 && (
+        <section data-theme="pomegranate" class="section wall">
+          <div class="wrap">
+            <h2 class="mono mono-caps wall-title">From the audience</h2>
+            <ul class="quotes" role="list">
+              {d.audienceQuotes.map((q) => (
+                <li><q>{q}</q></li>
               ))}
             </ul>
+          </div>
+        </section>
+      )}
+
+      {/* 4. Strapline, lead and prose */}
+      <section data-theme="saffron" class="section">
+        <div class="wrap">
+          {d.strapline && <p class="display accent strap">{d.strapline}</p>}
+          <p class="lead">{d.summary}</p>
+          {hasBody && (
+            <div class="prose">
+              <Content />
+            </div>
           )}
         </div>
       </section>
+
+      {/* 5. Press quotes */}
+      {d.pressQuotes.length > 0 && (
+        <section data-theme="dark" class="section">
+          <div class="wrap">
+            <h2 class="mono mono-caps wall-title">Press</h2>
+            <ul class="press" role="list">
+              {d.pressQuotes.map((p) => (
+                <li>
+                  <blockquote>
+                    <p>{p.quote}</p>
+                    <footer class="mono">{p.source}</footer>
+                  </blockquote>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* 6. Gallery */}
+      {d.gallery.length > 0 && (
+        <section data-theme="saffron" class="section">
+          <div class="wrap">
+            <h2 class="mono mono-caps wall-title">Pictures</h2>
+            <ul class="gallery" role="list">
+              {d.gallery.map((g) => (
+                <li class={g.image.height > g.image.width ? "tall" : undefined}>
+                  <figure>
+                    <Image src={g.image} alt={g.alt} widths={[480, 800, 1200]} sizes="(min-width: 900px) 400px, 50vw" />
+                    {g.photographer && <figcaption class="mono">Photo: {g.photographer}</figcaption>}
+                  </figure>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* 7. Links */}
+      {d.links.length > 0 && (
+        <section data-theme="light" class="section">
+          <div class="wrap">
+            <h2>Read more</h2>
+            <ul class="links mono">
+              {d.links.map((l) => (
+                <li><a href={l.url} rel="noopener">{l.label}</a></li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* 8. Connected work */}
       {connected.length > 0 && (
         <section data-theme="quiet" class="section">
           <div class="wrap">
@@ -65,11 +168,70 @@ const connected = entry.data.connected
 </Base>
 
 <style>
-  .prose, .lead { max-width: var(--measure); }
-  .hero { margin: 0 0 var(--s-8); }
-  .hero img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid var(--ink); }
-  .hero figcaption { margin-top: var(--s-2); }
-  .links { list-style: none; padding: 0; margin: var(--s-8) 0 0; }
+  /* Display type: the title is the biggest thing on the page (design.md section 4) */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--display);
+    line-height: 0.95;
+    letter-spacing: var(--track-tight);
+    margin: 0 0 var(--s-4);
+    max-width: none;
+  }
+  .display [lang="fa"] { font-family: var(--font-farsi); font-weight: 800; display: inline-block; margin-inline-start: 0.15em; line-height: 1.1; }
+  .accent { color: var(--accent); }
+
+  /* 1. Hero */
+  .hero { position: relative; min-height: 70vh; display: flex; align-items: flex-end; overflow: hidden; }
+  @media (min-width: 900px) { .hero { min-height: 80vh; } }
+  .hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero-text {
+    position: relative;
+    width: 100%;
+    padding: var(--s-24) 0 var(--s-8);
+    /* Solid Ink where the text sits, fading upwards over the photograph */
+    background: linear-gradient(to top, var(--ink) 0%, var(--ink) 60%, rgba(26, 26, 26, 0.7) 82%, rgba(26, 26, 26, 0) 100%);
+  }
+  .hero-text .display { color: var(--saffron); }
+  .hero--plain { padding: var(--s-16) 0 var(--s-8); }
+  .crumb { margin: 0 0 var(--s-4); }
+  .credit { margin: var(--s-2) 0 0; opacity: 0.85; }
+
+  /* 3. Quote wall: a poster, not a list. DOM order is reading order; sizes are CSS only. */
+  .wall-title { margin: 0 0 var(--s-8); font-weight: 700; }
+  .quotes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: var(--s-3) var(--s-8); text-align: center; }
+  .quotes li { max-width: 100%; font-family: var(--font-display); font-weight: 800; line-height: 1; letter-spacing: var(--track-tight); font-size: clamp(1.5rem, 4vw, 2.75rem); }
+  .quotes li:nth-child(3n) { color: var(--saffron); }
+  .quotes li:nth-child(4n + 2) { font-size: clamp(2rem, 6vw, 4.5rem); }
+  .quotes li:nth-child(9) { font-size: clamp(2.5rem, 9vw, 7rem); flex-basis: 100%; }
+  .quotes li:nth-child(5n + 1) { font-size: clamp(1.25rem, 3vw, 2rem); }
+  .quotes q { quotes: "\201C" "\201D"; }
+  .quotes li:nth-child(2n) { transform: rotate(-1.5deg); }
+  .quotes li:nth-child(7n) { transform: rotate(1.5deg); }
+
+  /* 4. Strapline and prose */
+  .strap { margin-bottom: var(--s-8); }
+  .lead { font-size: var(--p-large); font-weight: 600; max-width: var(--measure); }
+  .prose { max-width: var(--measure); }
+
+  /* 5. Press quotes */
+  .press { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-8) var(--s-12); }
+  @media (min-width: 900px) { .press { grid-template-columns: 1fr 1fr; } }
+  .press blockquote { margin: 0; max-width: none; }
+  .press blockquote p { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.5rem, 3vw, 2.25rem); line-height: 1.05; letter-spacing: var(--track-tight); color: var(--saffron); margin: 0 0 var(--s-3); max-width: none; }
+  .press blockquote p::before { content: "\201C"; }
+  .press blockquote p::after { content: "\201D"; }
+
+  /* 6. Gallery: two columns on phones, three on desktop, portraits take two rows */
+  .gallery { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 42vw; grid-auto-flow: dense; gap: var(--s-3); }
+  @media (min-width: 900px) { .gallery { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 260px; gap: var(--s-4); } }
+  .gallery li.tall { grid-row: span 2; }
+  .gallery figure { margin: 0; height: 100%; position: relative; }
+  .gallery img { width: 100%; height: 100%; object-fit: cover; border: 1px solid var(--ink); }
+  .gallery figcaption { position: absolute; left: 0; bottom: 0; padding: var(--s-1) var(--s-2); background: var(--ink); color: var(--paper); font-size: 0.75rem; }
+
+  /* 7 and 8 */
+  .links { list-style: none; padding: 0; margin: var(--s-4) 0 0; }
   .links li + li { margin-top: var(--s-2); }
   .connected { list-style: none; padding: 0; margin: var(--s-4) 0 0; }
   .connected li + li { margin-top: var(--s-4); }
