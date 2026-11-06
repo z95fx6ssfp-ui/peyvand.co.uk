@@ -17,7 +17,7 @@ links:
     url: "https://vimeo.com/1043158748"
   - label: "Project site"
     url: "https://apolune.myportfolio.com/"
-connected: ["dual"]
+connected: []
 ---
 
 Apolune: Systems Normal takes NASA's Apollo 11 archive and reworks it as a performance environment, co-created with the visual artist and filmmaker Matthew Robinson. Mission transcripts become the script. Archive footage runs into live camera feeds. Projection mapping borrows the look of 1960s broadcast technology, so the room feels like a control centre that has been left on too long.
