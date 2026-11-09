@@ -5,6 +5,7 @@ role: ["lead artist", "co-creator", "performer", "writer"]
 medium: ["installation", "theatre", "film"]
 setting: ["live", "gallery"]
 status: produced
+thread: ["archives-and-officialdom", "access-led-making"]
 featured: true
 with: "Matthew Robinson"
 venue: "The Pit, Barbican Centre (CRIPtic Arts: The Acts); APT Gallery, London"

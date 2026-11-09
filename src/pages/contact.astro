@@ -1,0 +1,102 @@
+---
+// Contact template (plan step 8). Categorised enquiry form: the Casting option shows Lucy's
+// details instead of a form, the others go to assistant@. Form provider is still to decide
+// (Formspree, Web3Forms or Jotform); until then the form posts nowhere and the button is
+// disabled, with the email addresses as the working route. Labels visible, errors as text.
+import Base from "../layouts/Base.astro";
+const categories = ["Casting", "Programming or touring", "Funding or partnership", "Press", "Workshops and teaching", "Other"];
+---
+
+<Base title="Contact · Peyvand Sadeghian" description="How to get in touch with Peyvand Sadeghian: acting enquiries via Middleweek Newton Talent Management; everything else via assistant@peyvand.co.uk.">
+  <main id="main">
+    <section data-theme="saffron" class="section">
+      <div class="wrap">
+        <h1 class="display accent settle">Contact</h1>
+        <p class="lead">Say what it is about and the right person gets it.</p>
+      </div>
+    </section>
+
+    <section data-theme="light" class="section">
+      <div class="wrap two">
+        <form class="form" action="#" method="post" id="enquiry" novalidate>
+          <div class="field">
+            <label for="category">This is about</label>
+            <select id="category" name="category" required>
+              <option value="">Choose one</option>
+              {categories.map((c) => <option value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div class="field" data-casting hidden>
+            <p class="lead">Acting enquiries go to my agent.</p>
+            <p>
+              Lucy Middleweek<br />
+              Middleweek Newton Talent Management<br />
+              Holy Cross Church Crypt, Cromer Street, London WC1H 8JU<br />
+              <a href="tel:+442033940079">020 3394 0079</a><br />
+              <a href="mailto:agents@mntalent.co.uk">agents@mntalent.co.uk</a>
+            </p>
+          </div>
+          <div data-general>
+            <div class="field">
+              <label for="name">Your name</label>
+              <input id="name" name="name" type="text" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="email">Your email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required />
+            </div>
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="6" required></textarea>
+            </div>
+            <p class="mono">PLACEHOLDER: the form sends once a provider is chosen. Until then write to <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a>.</p>
+            <button class="button" type="submit" disabled>Send message</button>
+          </div>
+        </form>
+        <aside>
+          <h2>Direct</h2>
+          <p><strong>Acting:</strong> <a href="mailto:agents@mntalent.co.uk">agents@mntalent.co.uk</a></p>
+          <p><strong>Everything else:</strong> <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a></p>
+          <p><strong>DUAL bookings:</strong> <a href="mailto:dual@peyvand.co.uk">dual@peyvand.co.uk</a></p>
+          <h2>Elsewhere</h2>
+          <ul class="mono plain">
+            <li><a href="https://app.spotlight.com/3874-6753-2954">Spotlight</a></li>
+            <li><a href="https://www.instagram.com/peyvandofpersia/">Instagram</a></li>
+            <li><a href="https://www.tiktok.com/@peyvand">TikTok</a></li>
+            <li><a href="https://www.linkedin.com/in/peyvands/">LinkedIn</a></li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
+  .accent { color: var(--accent); }
+  .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; }
+  .two { display: grid; gap: var(--s-12); }
+  @media (min-width: 900px) { .two { grid-template-columns: 3fr 2fr; } }
+  .field { margin-bottom: var(--s-6); }
+  label { display: block; font-family: var(--font-display); font-weight: 700; margin-bottom: var(--s-2); }
+  input, select, textarea { width: 100%; max-width: var(--measure); padding: var(--s-3); border: 2px solid var(--ink); border-radius: var(--radius); background: #fff; color: var(--ink); min-height: var(--tap); }
+  .button[disabled] { opacity: 0.6; cursor: not-allowed; }
+  aside h2 { margin-top: 0; }
+  aside h2 + p, aside h2 + ul { margin-top: 0; }
+  aside h2:not(:first-child) { margin-top: var(--s-8); }
+  .plain { list-style: none; padding: 0; }
+  .plain li { padding-block: var(--s-1); }
+</style>
+
+<script>
+  const select = document.getElementById("category") as HTMLSelectElement;
+  const casting = document.querySelector<HTMLElement>("[data-casting]")!;
+  const general = document.querySelector<HTMLElement>("[data-general]")!;
+  const update = () => {
+    const isCasting = select.value === "Casting";
+    casting.hidden = !isCasting;
+    general.hidden = isCasting;
+  };
+  select.addEventListener("change", update);
+  update();
+</script>

@@ -19,6 +19,13 @@ The files in this repo are generated from Notion. Editing them directly still wo
 - The file name becomes the web address: `toto-kerblammo.md` is `/work/toto-kerblammo/`. Lower case, hyphens, no spaces.
 - `imageAlt` is the description a screen reader gives instead of the picture. One sentence. Leave it empty ("") only while the placeholder is in use.
 
+## Threads, lenses and tags (added 9 Nov 2026)
+
+- **Tags** are links everywhere. Tapping one on a card or an entry page opens the Work page filtered to that tag; tapping one on the Work page toggles it. The web address carries the filters, so a filtered view can be sent to someone (e.g. `/work/?medium=puppetry`).
+- **Threads** are the recurring questions that run across the work. Each is a file in `src/content/threads/` (copy `_template.md` there), with a short first-person text as the body. An entry joins a thread by listing the thread's file name under `thread:` (two at most). Threads have their own pages at `/work/threads/`.
+- **Lenses** are ways in for different visitors: Casting, Programmers, Funders, Press. They are defined once in `src/content.config.ts` (`LENSES`) and need no work per entry beyond correct tags, `producedByNist` and `funders`. Send a lens as a link: `/work/?lens=casting`.
+- **Studio**: `/studio` is a private status page listing every entry's gaps (no image, no quotes, no thread and so on). Nothing is edited there; it points back to Notion.
+
 ## What goes where
 
 - Artistic output (shows, roles, films, installations, writing, commissions) goes in Work.

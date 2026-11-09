@@ -1,0 +1,77 @@
+---
+// Nist page template (plan step 8). The one page that uses the Nist colours at full strength
+// (design.md section 2, "The Nist page exception"). Must not say "Ltd" or show a company number.
+// Logo: PLACEHOLDER until the file is in the repo. Support and income route: open question.
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import Card from "../components/Card.astro";
+
+const entries = (await getCollection("work")).filter((e) => e.data.producedByNist).sort((a, b) => b.data.year - a.data.year);
+const threads = await getCollection("threads");
+const threadsFor = (e: (typeof entries)[number]) =>
+  e.data.thread.map((t) => threads.find((x) => x.id === t.id)).filter(Boolean).map((t) => ({ id: t!.id, title: t!.data.title }));
+---
+
+<Base title="Nist · Peyvand Sadeghian" description="Nist is Peyvand Sadeghian's interdisciplinary company, based at Bernie Grant Arts Centre, Tottenham.">
+  <main id="main" class="nist">
+    <section class="section nist-hero">
+      <div class="wrap">
+        <p class="mono logo-slot">PLACEHOLDER: Nist logo (black block, pink, teal and yellow arcs).</p>
+        <h1 class="display settle">Nist</h1>
+        <p class="lead">PLACEHOLDER: what Nist is in two sentences. Peyvand's interdisciplinary company, based at Studio 7, Enterprise Building, Bernie Grant Arts Centre, Tottenham.</p>
+      </div>
+    </section>
+
+    <section class="section nist-teal">
+      <div class="wrap">
+        <h2>What Nist does</h2>
+        <p>PLACEHOLDER: producing, commissions, workshops under the Nist name, how projects are made and who with.</p>
+      </div>
+    </section>
+
+    <section class="section nist-pink">
+      <div class="wrap">
+        <h2>Support the work</h2>
+        <p class="lead">PLACEHOLDER: the support and donation route once decided (open question in the progress log). Nothing here yet.</p>
+      </div>
+    </section>
+
+    <section class="section nist-yellow">
+      <div class="wrap">
+        <div class="band-head">
+          <h2 class="mono mono-caps band-title">Produced by Nist</h2>
+          <a href="/work/?nist=1">See all in Work</a>
+        </div>
+        {entries.length > 0 ? (
+          <div class="grid">{entries.map((e) => <Card entry={e} threads={threadsFor(e)} />)}</div>
+        ) : (
+          <p class="lead">No entries are marked Produced by Nist yet. Tick the box in Notion on the projects Nist produced and sync.</p>
+        )}
+      </div>
+    </section>
+
+    <section data-theme="light" class="section">
+      <div class="wrap">
+        <h2>Contact</h2>
+        <p>Studio 7, Enterprise Building, Bernie Grant Arts Centre, Town Hall Approach Road, Tottenham Green, London N15 4RX<br /><a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a></p>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  /* Nist colours, this page only. Pink and Teal are fills, never text on light. */
+  .nist-hero { background: var(--nist-white); color: var(--ink); }
+  .nist-teal { background: var(--nist-teal); color: var(--nist-white); --link: var(--nist-white); --focus: var(--nist-yellow); }
+  .nist-pink { background: var(--nist-pink); color: var(--ink); --link: var(--ink); --focus: var(--ink); }
+  .nist-yellow { background: var(--nist-yellow); color: var(--ink); --link: var(--ink); --focus: var(--ink); --accent: var(--pomegranate); }
+  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
+  .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; }
+  .logo-slot { display: inline-block; border: 1px solid var(--ink); padding: var(--s-3); margin-bottom: var(--s-6); }
+  .band-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4); flex-wrap: wrap; }
+  .band-title { margin: 0 0 var(--s-6); font-weight: 700; }
+  .grid { display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
+  @media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  h2 { margin-top: 0; }
+</style>

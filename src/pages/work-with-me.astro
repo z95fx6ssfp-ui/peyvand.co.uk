@@ -1,0 +1,60 @@
+---
+// Work with me template (plan step 8). Every bookable offer, each saying whether Peyvand or
+// Nist delivers it, with evidence. Workshops, teaching, talks and facilitation live here,
+// never in Work. PLACEHOLDER copy to be replaced; seed is the Work with me section on /aboutold.
+import Base from "../layouts/Base.astro";
+
+const offers = [
+  { title: "Workshops", by: "Peyvand or Nist", text: "PLACEHOLDER: puppetry, devising, performance and sound workshops for schools, universities, community groups and companies. Formats and lengths.", evidence: "PLACEHOLDER: e.g. Leicester sound workshops for Pigeon Tower, 2026; Oregon University London workshops." },
+  { title: "Teaching", by: "Peyvand", text: "PLACEHOLDER: higher education teaching and guest lectures. Currently Associate Lecturer at CCW, UAL.", evidence: "PLACEHOLDER" },
+  { title: "Talks and panels", by: "Peyvand", text: "PLACEHOLDER: talks on diaspora, archives, access-led making and interdisciplinary practice.", evidence: "PLACEHOLDER" },
+  { title: "Facilitation and dramaturgy", by: "Peyvand or Nist", text: "PLACEHOLDER: outside eye, dramaturgy, creative access support for companies in development.", evidence: "PLACEHOLDER" },
+  { title: "Mentoring", by: "Peyvand", text: "PLACEHOLDER: one-to-one for early-career artists.", evidence: "PLACEHOLDER" },
+];
+---
+
+<Base title="Work with me · Peyvand Sadeghian" description="Workshops, teaching, talks, facilitation and mentoring with Peyvand Sadeghian, delivered as herself or through Nist.">
+  <main id="main">
+    <section data-theme="pomegranate" class="section">
+      <div class="wrap">
+        <h1 class="display settle">Work with me</h1>
+        <p class="lead">PLACEHOLDER: two sentences on what you can book and who it is for. Each offer says whether it is delivered by Peyvand or through Nist.</p>
+      </div>
+    </section>
+
+    <section data-theme="light" class="section">
+      <div class="wrap">
+        <ul class="offers" role="list">
+          {offers.map((o) => (
+            <li class="offer rise">
+              <h2>{o.title}</h2>
+              <p class="mono by">Delivered by {o.by}</p>
+              <p>{o.text}</p>
+              <p class="mono evidence">Recent: {o.evidence}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section data-theme="saffron" class="section">
+      <div class="wrap">
+        <h2>Booking</h2>
+        <p class="lead">Write to <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a> with dates, group and budget, or use the <a href="/contact">contact form</a>.</p>
+        <p class="mono">Acting enquiries go to Lucy Middleweek at Middleweek Newton Talent Management: <a href="mailto:agents@mntalent.co.uk">agents@mntalent.co.uk</a>.</p>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
+  .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; }
+  .offers { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--grid-gap); }
+  @media (min-width: 900px) { .offers { grid-template-columns: repeat(2, 1fr); } }
+  .offer { border: 1px solid var(--ink); padding: var(--s-6); display: flex; flex-direction: column; gap: var(--s-2); }
+  .offer h2 { margin: 0; }
+  .offer p { margin: 0; }
+  .by { color: var(--pomegranate); }
+  .evidence { margin-top: auto; padding-top: var(--s-3); }
+</style>

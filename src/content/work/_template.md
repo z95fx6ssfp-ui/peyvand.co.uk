@@ -20,8 +20,13 @@ setting: ["live"]
 # status: R&D · in development · produced · touring · archived   (one only; leave out for produced)
 # status: touring
 
-featured: false            # true = appears in the curated row at the top of Work
-producedByNist: false      # true = "Produced by Nist" in the facts line
+# THREADS. Up to two. Use the file names in src/content/threads/ (without .md).
+# Current: archives-and-officialdom · puppets-and-objects · iran-and-the-diaspora · access-led-making
+thread: []
+
+featured: false            # true = appears in the curated row at the top of Work and on the homepage
+producedByNist: false      # true = "Produced by Nist" in the facts line and on the Nist page
+# funders: ["Arts Council England", "Tamasha"]   # shown on the Funders lens and on the page
 
 # FACTS LINE. Everything below is optional; whatever you fill in is assembled automatically.
 # character: "Coral"                      # for acting roles: shows as "as Coral"
@@ -37,6 +42,20 @@ imageAlt: ""               # one sentence describing the picture, for screen rea
 
 # ONE OR TWO SENTENCES, under 200 characters. Shows on the card and at the top of the page.
 summary: "What it is, in plain words."
+
+# BOLD PAGE EXTRAS (all optional; each section is left out when empty).
+# strapline: "Autobiographical agitprop."    # one line at poster size, under 60 characters
+# video: "https://vimeo.com/674485381"       # Vimeo or YouTube page URL; embedded after the hero
+# videoTitle: "Trailer"
+# audienceQuotes:                            # short, unattributed; shown as a word wall
+#   - "Fierce and funny."
+# pressQuotes:
+#   - quote: "A bravura hour."
+#     source: "Lyn Gardner, Stagedoor"
+# gallery:                                   # files in src/assets/work/, each with its own alt text
+#   - image: "../../assets/work/project-02.jpg"
+#     alt: "One sentence describing the picture."
+#     photographer: "Ali Wright"
 
 # LINKS. Trailer, reviews, tickets, the company's page. Any number.
 links: []
@@ -55,6 +74,4 @@ Use "## " at the start of a line for a sub-heading, for example:
 
 Name, role · Name, role.
 
-## Press
-
-"Quote." Publication
+(Press quotes go in pressQuotes above, not here, so they can be set as a wall.)

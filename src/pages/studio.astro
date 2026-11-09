@@ -1,0 +1,123 @@
+---
+// Studio (9 Nov 2026): a private, read-only status page for Peyvand, generated at build time.
+// Lists every entry with its gaps and a link to its Notion page, so she can see what is thin,
+// fix it in Notion, and ask for a sync. Notion stays the only place content is edited.
+// Protect with Cloudflare Access (plan step 9); until then it is simply unlinked and noindex.
+import { getCollection } from "astro:content";
+import Base from "../layouts/Base.astro";
+import { LENSES, LENS_KEYS } from "../content.config";
+
+const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.data.year);
+const threads = (await getCollection("threads")).sort((a, b) => a.data.order - b.data.order);
+const built = new Date().toLocaleString("en-GB", { dateStyle: "long", timeStyle: "short", timeZone: "Europe/London" });
+
+type Row = { id: string; title: string; year: number; gaps: string[]; placeholders: boolean; threads: string[] };
+const rows: Row[] = entries.map((e) => {
+  const d = e.data;
+  const gaps: string[] = [];
+  const placeholderImage = d.image && /placeholder/.test(d.image.src);
+  if (!d.image || placeholderImage) gaps.push("main image");
+  if (d.image && !placeholderImage && !d.imageAlt) gaps.push("alt text");
+  if (!d.photographer && d.image && !placeholderImage) gaps.push("photographer");
+  if (!d.strapline) gaps.push("strapline");
+  if (!d.video) gaps.push("video");
+  if (!d.audienceQuotes.length) gaps.push("audience quotes");
+  if (!d.pressQuotes.length) gaps.push("press quotes");
+  if (!d.gallery.length) gaps.push("gallery");
+  if (!d.connected.length) gaps.push("connected work");
+  if (!d.thread.length) gaps.push("thread");
+  if (d.producedByNist && !d.funders.length) gaps.push("funders");
+  if (!d.links.length) gaps.push("links");
+  const body = e.body ?? "";
+  return { id: e.id, title: d.title, year: d.year, gaps, placeholders: /PLACEHOLDER/i.test(body) || !!placeholderImage, threads: d.thread.map((t) => t.id) };
+});
+
+const lensCounts = LENS_KEYS.map((k) => {
+  const L = LENSES[k];
+  const n = entries.filter((e) => {
+    if (L.roles && !L.roles.some((r) => e.data.role.includes(r as never))) return false;
+    if (L.statuses && !L.statuses.includes(e.data.status)) return false;
+    if (L.nist && !e.data.producedByNist) return false;
+    if (L.press && !e.data.pressQuotes.length) return false;
+    return true;
+  }).length;
+  return { key: k, label: L.label, n };
+});
+const notion = "https://app.notion.com/p/5b102617b3e54cb7b5340c464558a82e";
+---
+
+<Base title="Studio · peyvand.co.uk" description="Private status page.">
+  <main id="main">
+    <section data-theme="dark" class="section">
+      <div class="wrap">
+        <p class="mono mono-caps">Private · built {built}</p>
+        <h1>Studio</h1>
+        <p class="lead">What is on the site and what is still thin. Edit in <a href={notion}>Notion: Website: Work</a>, then say "sync the website".</p>
+      </div>
+    </section>
+
+    <section data-theme="light" class="section">
+      <div class="wrap">
+        <h2>Entries ({entries.length})</h2>
+        <table class="studio">
+          <thead><tr><th>Entry</th><th>Year</th><th>Threads</th><th>Gaps</th><th>Notion</th></tr></thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr class={r.gaps.length > 6 ? "thin" : undefined}>
+                <td data-label="Entry"><a href={`/work/${r.id}/`}>{r.title}</a>{r.placeholders && <span class="mono flag"> placeholder content</span>}</td>
+                <td data-label="Year" class="mono">{r.year}</td>
+                <td data-label="Threads" class="mono">{r.threads.join(", ") || "none"}</td>
+                <td data-label="Gaps" class="mono">{r.gaps.length ? r.gaps.join(", ") : "complete"}</td>
+                <td data-label="Notion"><a href={notion}>open database</a></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section data-theme="quiet" class="section">
+      <div class="wrap two">
+        <div>
+          <h2>Threads ({threads.length})</h2>
+          <ul class="mono plain">
+            {threads.map((t) => (
+              <li><a href={`/work/threads/${t.id}/`}>{t.data.title}</a> · {entries.filter((e) => e.data.thread.some((x) => x.id === t.id)).length} works{t.data.placeholder && " · PLACEHOLDER text"}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2>Lenses</h2>
+          <ul class="mono plain">
+            {lensCounts.map((l) => <li><a href={`/work/?lens=${l.key}`}>{l.label}</a> · {l.n} entries</li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section data-theme="light" class="section">
+      <div class="wrap">
+        <h2>Pages with placeholder copy</h2>
+        <p class="mono">Home · About · Work with me · Nist · Contact (form provider) · Access · Privacy · Work lens pins (reel, headshots, track record, press kit). Search the repo for PLACEHOLDER to see them all.</p>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .two { display: grid; gap: var(--s-8); }
+  @media (min-width: 900px) { .two { grid-template-columns: 1fr 1fr; } }
+  .plain { list-style: none; padding: 0; margin: 0; }
+  .plain li { padding-block: var(--s-1); max-width: none; }
+  .studio { width: 100%; border-collapse: collapse; margin-top: var(--s-4); }
+  .studio th, .studio td { text-align: left; vertical-align: top; padding: var(--s-2) var(--s-3); border-bottom: 1px solid var(--ink); }
+  .studio th { font-family: var(--font-mono); font-size: var(--mono); text-transform: uppercase; letter-spacing: var(--track-caps); }
+  .thin td:first-child { border-left: 4px solid var(--pomegranate); }
+  .flag { color: var(--pomegranate); }
+  @media (max-width: 599.98px) {
+    .studio thead { display: none; }
+    .studio tr { display: block; border: 1px solid var(--ink); margin-bottom: var(--s-4); }
+    .studio td { display: block; border: 0; }
+    .studio td::before { content: attr(data-label) ": "; font-family: var(--font-mono); font-size: var(--mono); text-transform: uppercase; }
+  }
+</style>

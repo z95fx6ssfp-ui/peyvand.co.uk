@@ -8,6 +8,7 @@ import Base from "../../layouts/Base.astro";
 import FactsLine from "../../components/FactsLine.astro";
 import VideoEmbed from "../../components/VideoEmbed.astro";
 import { Image } from "astro:assets";
+import Tag from "../../components/Tag.astro";
 
 export async function getStaticPaths() {
   const entries = await getCollection("work");
@@ -25,6 +26,8 @@ const connected = d.connected.map((id) => all.find((e) => e.id === id)).filter(B
 const farsi = d.title.match(/[؀-ۿ][؀-ۿ\s‌]*/);
 const latin = farsi ? d.title.replace(farsi[0], "").trim() : d.title;
 const hasBody = headings.length > 0 || entry.body?.trim();
+const allThreads = await getCollection("threads");
+const threads = d.thread.map((t) => allThreads.find((x) => x.id === t.id)).filter(Boolean);
 ---
 
 <Base title={`${d.title} · Peyvand Sadeghian`} description={d.summary}>
@@ -33,16 +36,23 @@ const hasBody = headings.length > 0 || entry.body?.trim();
       {/* 1. Hero */}
       {d.image ? (
         <section class="hero" data-theme="dark">
-          <Image class="hero-img" src={d.image} alt={d.imageAlt ?? ""} widths={[800, 1200, 1600, 2400]} sizes="100vw" loading="eager" fetchpriority="high" />
+          <Image class="hero-img" src={d.image} alt={d.imageAlt ?? ""} widths={[800, 1200, 1600, 2400]} sizes="100vw" loading="eager" fetchpriority="high" style={`view-transition-name: work-${entry.id}`} />
           <div class="hero-text">
             <div class="wrap">
               <p class="mono crumb"><a href="/work/">Work</a></p>
-              <h1 class="display">
+              <h1 class="display settle">
                 <span>{latin}</span>{" "}
                 {farsi && <span lang="fa" dir="rtl">{farsi[0].trim()}</span>}
               </h1>
               <FactsLine data={d} />
               {d.photographer && <p class="mono credit">Photo: {d.photographer}</p>}
+              <ul class="tags" role="list">
+                {d.role.map((r) => <li><Tag group="role" value={r} /></li>)}
+                {d.medium.map((m) => <li><Tag group="medium" value={m} /></li>)}
+                {d.setting.map((x) => <li><Tag group="setting" value={x} /></li>)}
+                {d.producedByNist && <li><Tag group="nist" value="nist" label="Produced by Nist" /></li>}
+                {threads.map((t) => <li><Tag group="thread" value={t!.id} label={t!.data.title} /></li>)}
+              </ul>
             </div>
           </div>
         </section>
@@ -50,11 +60,18 @@ const hasBody = headings.length > 0 || entry.body?.trim();
         <section class="hero hero--plain" data-theme="saffron">
           <div class="wrap">
             <p class="mono crumb"><a href="/work/">Work</a></p>
-            <h1 class="display accent">
+            <h1 class="display accent settle">
               <span>{latin}</span>{" "}
               {farsi && <span lang="fa" dir="rtl">{farsi[0].trim()}</span>}
             </h1>
             <FactsLine data={d} />
+            <ul class="tags" role="list">
+              {d.role.map((r) => <li><Tag group="role" value={r} /></li>)}
+              {d.medium.map((m) => <li><Tag group="medium" value={m} /></li>)}
+              {d.setting.map((x) => <li><Tag group="setting" value={x} /></li>)}
+              {d.producedByNist && <li><Tag group="nist" value="nist" label="Produced by Nist" /></li>}
+              {threads.map((t) => <li><Tag group="thread" value={t!.id} label={t!.data.title} /></li>)}
+            </ul>
           </div>
         </section>
       )}
@@ -75,7 +92,7 @@ const hasBody = headings.length > 0 || entry.body?.trim();
             <h2 class="mono mono-caps wall-title">From the audience</h2>
             <ul class="quotes" role="list">
               {d.audienceQuotes.map((q) => (
-                <li><q>{q}</q></li>
+                <li class="rise"><q>{q}</q></li>
               ))}
             </ul>
           </div>
@@ -87,6 +104,7 @@ const hasBody = headings.length > 0 || entry.body?.trim();
         <div class="wrap">
           {d.strapline && <p class="display accent strap">{d.strapline}</p>}
           <p class="lead">{d.summary}</p>
+          {d.funders.length > 0 && <p class="mono">Funded and supported by {d.funders.join(", ")}</p>}
           {hasBody && (
             <div class="prose">
               <Content />
@@ -121,7 +139,7 @@ const hasBody = headings.length > 0 || entry.body?.trim();
             <h2 class="mono mono-caps wall-title">Pictures</h2>
             <ul class="gallery" role="list">
               {d.gallery.map((g) => (
-                <li class={g.image.height > g.image.width ? "tall" : undefined}>
+                <li class={`rise${g.image.height > g.image.width ? " tall" : ""}`}>
                   <figure>
                     <Image src={g.image} alt={g.alt} widths={[480, 800, 1200]} sizes="(min-width: 900px) 400px, 50vw" />
                     {g.photographer && <figcaption class="mono">Photo: {g.photographer}</figcaption>}
@@ -196,6 +214,7 @@ const hasBody = headings.length > 0 || entry.body?.trim();
   .hero-text .display { color: var(--saffron); }
   .hero--plain { padding: var(--s-16) 0 var(--s-8); }
   .crumb { margin: 0 0 var(--s-4); }
+  .tags { list-style: none; margin: var(--s-4) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
   .credit { margin: var(--s-2) 0 0; opacity: 0.85; }
 
   /* 3. Quote wall: a poster, not a list. DOM order is reading order; sizes are CSS only. */

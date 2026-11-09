@@ -1,33 +1,117 @@
 ---
+// Homepage template (9 Nov 2026, plan step 7). Built to the 6 Nov rules: full-bleed photo,
+// colour slabs, type at display size. Copy marked PLACEHOLDER is to be replaced by Peyvand.
+// Sections: hero photo with the line · four lens shortcuts (saffron) · Where to see me next (dark)
+// · selected work (light) · one sentence (pomegranate) · recognition (quiet) · stay in touch (saffron)
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
 import Base from "../layouts/Base.astro";
+import Card from "../components/Card.astro";
+import { LENSES } from "../content.config";
+import hero from "../assets/work/dual-main.jpg";
+
+const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.data.year);
+const threads = await getCollection("threads");
+const threadsFor = (e: (typeof entries)[number]) =>
+  e.data.thread.map((t) => threads.find((x) => x.id === t.id)).filter(Boolean).map((t) => ({ id: t!.id, title: t!.data.title }));
+const featured = entries.filter((e) => e.data.featured).slice(0, 6);
+const shortcuts = (["casting", "programmers", "funders", "press"] as const).map((k) => ({ key: k, ...LENSES[k] }));
 ---
 
-<Base title="Peyvand Sadeghian" description="Performer, performance maker and writer.">
+<Base title="Peyvand Sadeghian" description="Performer, performance maker and writer. Stage, screen, installation, puppetry and film.">
   <main id="main">
-    <section data-theme="light" class="section">
+    <section class="hero" data-theme="dark">
+      <Image class="hero__img" src={hero} alt="PLACEHOLDER: Peyvand performing in DUAL, lit by a green glitching projection. Replace with the chosen homepage photograph and its own description." widths={[800, 1200, 1600, 2400]} sizes="100vw" loading="eager" fetchpriority="high" />
+      <div class="hero__text">
+        <div class="wrap">
+          <h1 class="display settle">Performer, performance maker and writer.</h1>
+          <p class="lead">Stage, screen, installation, puppetry and film.</p>
+          <p class="mono credit">Photo: Ali Wright</p>
+        </div>
+      </div>
+    </section>
+
+    <section data-theme="saffron" class="section">
       <div class="wrap">
-        <p class="mono mono-caps">Site in progress · November 2026</p>
-        <h1>Peyvand Sadeghian</h1>
-        <p class="lead">Performer, performance maker and writer.</p>
-        <p>Stage, screen, installation, puppetry and film.</p>
-        <h2>Type and colour check</h2>
-        <p>This page exists so the build pipeline and the design tokens can be checked in a real browser. It is not public copy.</p>
-        <p class="mono">Installation · 2026 · Leicester · Lead artist · <span style="color: var(--pomegranate)">Produced by Nist</span></p>
-        <p><a href="#main">A link in body text</a>, underlined, Firoozeh on Paper.</p>
-        <p>
-          <a class="button" href="#main">Primary button</a>
-          <a class="button button--secondary" href="#main">Secondary button</a>
-        </p>
-        <p lang="fa">پیوند</p>
+        <h2 class="mono mono-caps band-title">Here for</h2>
+        <ul class="shortcuts" role="list">
+          {shortcuts.map((s) => (
+            <li>
+              <a class="shortcut" href={`/work/?lens=${s.key}`}>
+                <span class="shortcut__title">{s.label}</span>
+                <span class="shortcut__text">{s.intro}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section data-theme="dark" class="section">
+      <div class="wrap">
+        <h2 class="mono mono-caps band-title">Where to see me next</h2>
+        <p class="lead">PLACEHOLDER: the next public date, venue and a booking link. When there is nothing booked: "Nothing announced yet. Join the list below to hear first."</p>
+      </div>
+    </section>
+
+    {featured.length > 0 && (
+      <section data-theme="light" class="section">
+        <div class="wrap">
+          <div class="band-head">
+            <h2 class="mono mono-caps band-title">Selected work</h2>
+            <a href="/work/">All work</a>
+          </div>
+          <div class="grid">
+            {featured.map((e) => <Card entry={e} threads={threadsFor(e)} />)}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <section data-theme="pomegranate" class="section">
+      <div class="wrap">
+        <p class="display one-line">PLACEHOLDER: one sentence, in Peyvand's words, on what the work is about.</p>
+        <p><a href="/about">About Peyvand</a></p>
       </div>
     </section>
 
     <section data-theme="quiet" class="section">
       <div class="wrap">
-        <p class="lead"><em>A quiet block, Rose background, for quotes, access notes and asides.</em></p>
-        <p class="mono">Attribution in mono below</p>
+        <h2 class="mono mono-caps band-title">Worked with</h2>
+        <p class="mono">PLACEHOLDER: the companies, venues and broadcasters from the 30-logo wall as a text list (or logos with alt text), e.g. Barbican · HOME · Camden People's Theatre · Netflix · BBC.</p>
+      </div>
+    </section>
+
+    <section data-theme="saffron" class="section">
+      <div class="wrap">
+        <h2>Stay in touch</h2>
+        <p class="lead">Performances, projects, the occasional postcard. No filler.</p>
+        <p class="mono">PLACEHOLDER: newsletter form once the provider is chosen. Until then: <a href="https://www.instagram.com/peyvandofpersia/">Instagram</a>.</p>
       </div>
     </section>
   </main>
-
 </Base>
+
+<style>
+  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); max-width: none; overflow-wrap: anywhere; }
+  .hero { position: relative; min-height: 80vh; display: flex; align-items: flex-end; overflow: hidden; }
+  @media (min-width: 900px) { .hero { min-height: 92vh; } }
+  .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero__text { position: relative; width: 100%; padding: var(--s-16) 0 var(--s-8); background: linear-gradient(to top, var(--ink) 0%, var(--ink) 40%, rgba(26,26,26,0.75) 70%, rgba(26,26,26,0) 100%); }
+  .hero__text .display { color: var(--saffron); font-size: clamp(2.25rem, 7vw, 6.5rem); }
+  .hero__text .lead { font-size: clamp(1.25rem, 2.2vw, 1.75rem); font-weight: 600; }
+  .credit { margin: var(--s-4) 0 0; opacity: 0.85; }
+  .band-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4); flex-wrap: wrap; }
+  .band-title { margin: 0 0 var(--s-6); font-weight: 700; }
+  .shortcuts { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
+  @media (min-width: 600px) { .shortcuts { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .shortcuts { grid-template-columns: repeat(4, 1fr); } }
+  .shortcut { display: flex; flex-direction: column; gap: var(--s-2); min-height: 100%; padding: var(--s-4); border: 2px solid var(--ink); color: var(--ink); text-decoration: none; transition: background-color var(--t-fast), color var(--t-fast); }
+  .shortcut:hover, .shortcut:focus-visible { background: var(--ink); color: var(--saffron); }
+  .shortcut__title { font-family: var(--font-display); font-weight: 800; font-size: var(--h2); line-height: var(--lh-tight); letter-spacing: var(--track-tight); }
+  .shortcut__text { font-size: var(--p-small); }
+  .grid { display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
+  @media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  .one-line { font-size: clamp(1.75rem, 5vw, 4.5rem); }
+</style>

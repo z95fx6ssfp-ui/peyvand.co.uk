@@ -1,0 +1,41 @@
+---
+// Lens strip (9 Nov 2026): the audience access points at the top of Work.
+// "Looking as:" followed by one link per lens; the active one is filled.
+// Links are real URLs (/work/?lens=casting) so they work without JavaScript and
+// can be sent to someone. On phones the row scrolls sideways.
+import { LENSES, LENS_KEYS, type LensKey } from "../content.config";
+interface Props { active?: LensKey }
+const { active = "everyone" } = Astro.props;
+---
+
+<nav class="lenses" aria-label="Looking as">
+  <span class="lenses__label mono mono-caps">Looking as</span>
+  <ul class="lenses__list" role="list">
+    {LENS_KEYS.map((key) => (
+      <li>
+        <a
+          class="lens"
+          href={key === "everyone" ? "/work/" : `/work/?lens=${key}`}
+          data-lens-link={key}
+          aria-current={key === active ? "true" : undefined}
+        >{LENSES[key].label}</a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .lenses { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-4); }
+  .lenses__label { font-weight: 700; }
+  .lenses__list { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--s-2); overflow-x: auto; max-width: 100%; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .lenses__list::-webkit-scrollbar { display: none; }
+  .lens {
+    display: inline-flex; align-items: center; white-space: nowrap;
+    min-height: var(--tap); padding: var(--s-2) var(--s-4);
+    font-family: var(--font-display); font-weight: 700; font-size: 1rem;
+    color: var(--fg); background: transparent; border: 2px solid var(--fg); border-radius: var(--radius);
+    text-decoration: none; transition: background-color var(--t-fast), color var(--t-fast);
+  }
+  .lens:hover, .lens:focus-visible { background: var(--fg); color: var(--bg); }
+  .lens[aria-current="true"] { background: var(--fg); color: var(--bg); }
+</style>

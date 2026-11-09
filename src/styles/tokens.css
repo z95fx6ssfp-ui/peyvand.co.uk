@@ -64,9 +64,13 @@
   --section-pad: var(--s-12);
   --grid-gap: var(--s-6);
 
-  /* Motion */
+  /* Motion (design.md section 7, rewritten 9 Nov 2026: motion shows structure, never decoration) */
   --t-fast: 150ms;
   --t-drawer: 200ms;
+  --t-reflow: 250ms;   /* cards leaving and reflowing when a filter or lens changes */
+  --t-settle: 600ms;   /* a title settling into place once on load */
+  --t-rise: 500ms;     /* quotes and gallery tiles rising into view on scroll */
+  --rise: 16px;
 
   /* Theme defaults = light (section 2, "Section themes") */
   --bg: var(--paper);
@@ -92,6 +96,10 @@
   :root {
     --h1: 3.25rem;
     --p: 1.0625rem;
+    /* Phones: the same motion, 20 per cent shorter */
+    --t-reflow: 200ms;
+    --t-settle: 480ms;
+    --t-rise: 400ms;
   }
 }
 

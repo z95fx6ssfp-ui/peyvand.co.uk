@@ -1,0 +1,131 @@
+---
+// Work card (design.md section 5, extended 9 Nov 2026). A framed object: image at 3:2,
+// 1px Ink border, title, mono facts strip, tags as links, up to two thread tags.
+// Carries data attributes for the filter script and lens-only facts for each lens,
+// shown by CSS when the catalogue has the matching data-lens. `size="large"` is the
+// curated row and thread pages; `size="card"` the catalogue.
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import FactsLine from "./FactsLine.astro";
+import Tag from "./Tag.astro";
+import { LENSES, LENS_KEYS } from "../content.config";
+
+interface Props {
+  entry: CollectionEntry<"work">;
+  threads?: { id: string; title: string }[];
+  size?: "card" | "large";
+  headingLevel?: "h2" | "h3";
+}
+const { entry, threads = [], size = "card", headingLevel = "h3" } = Astro.props;
+const d = entry.data;
+const Heading = headingLevel;
+const href = `/work/${entry.id}/`;
+const farsi = d.title.match(/[؀-ۿ][؀-ۿ\s‌]*/);
+const latin = farsi ? d.title.replace(farsi[0], "").trim() : d.title;
+
+// Lens-only facts (content.config.ts LENSES[lens].facts), rendered once and shown by CSS.
+const lensFacts: Record<string, string[]> = {};
+for (const key of LENS_KEYS) {
+  const want = LENSES[key].facts;
+  const out: string[] = [];
+  if (want.includes("character") && d.character) out.push(`as ${d.character}`);
+  if (want.includes("director") && d.director) out.push(`dir. ${d.director}`);
+  if (want.includes("venue") && d.venue) out.push(d.venue);
+  if (want.includes("company") && d.company) out.push(d.company);
+  if (want.includes("funders") && d.funders.length) out.push(`Funded by ${d.funders.join(", ")}`);
+  if (want.includes("press") && d.pressQuotes.length) out.push(`Reviewed: ${d.pressQuotes.map((p) => p.source).join(", ")}`);
+  if (want.includes("touring") && d.status === "touring") out.push("Available to tour");
+  if (out.length) lensFacts[key] = out;
+}
+---
+
+<article
+  class={`card card--${size}`}
+  data-slug={entry.id}
+  data-year={d.year}
+  data-role={d.role.join("|")}
+  data-medium={d.medium.join("|")}
+  data-setting={d.setting.join("|")}
+  data-status={d.status}
+  data-thread={d.thread.map((t) => t.id).join("|")}
+  data-nist={d.producedByNist ? "1" : "0"}
+  data-press={d.pressQuotes.length ? "1" : "0"}
+  data-featured={d.featured ? "1" : "0"}
+>
+  <a class="card__media" href={href} tabindex="-1" aria-hidden="true">
+    {d.image ? (
+      <Image
+        src={d.image}
+        alt=""
+        widths={size === "large" ? [800, 1200, 1600] : [480, 800]}
+        sizes={size === "large" ? "(min-width: 900px) 50vw, 100vw" : "(min-width: 900px) 33vw, (min-width: 600px) 50vw, 100vw"}
+        style={`view-transition-name: work-${entry.id}`}
+      />
+    ) : (
+      <div class="card__blank" aria-hidden="true"><span class="display">{latin.slice(0, 1)}</span></div>
+    )}
+    {d.status !== "produced" && <span class="card__stamp mono mono-caps">{d.status}</span>}
+  </a>
+  <div class="card__body">
+    <Heading class="card__title">
+      <a href={href}>
+        <span>{latin}</span>
+        {farsi && <>{" "}<span lang="fa" dir="rtl">{farsi[0].trim()}</span></>}
+      </a>
+    </Heading>
+    <FactsLine data={d} />
+    {Object.entries(lensFacts).map(([key, facts]) => (
+      <p class={`card__lens-facts mono lens-${key}`}>{facts.join(" · ")}</p>
+    ))}
+    <p class="card__summary">{d.summary}</p>
+    <ul class="card__tags" role="list">
+      {d.role.map((r) => <li><Tag group="role" value={r} /></li>)}
+      {d.medium.map((m) => <li><Tag group="medium" value={m} /></li>)}
+      {d.setting.map((s) => <li><Tag group="setting" value={s} /></li>)}
+      {d.producedByNist && <li><Tag group="nist" value="nist" label="Produced by Nist" /></li>}
+      {threads.map((t) => <li><Tag group="thread" value={t.id} label={t.title} /></li>)}
+    </ul>
+  </div>
+</article>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+    height: 100%;
+  }
+  .card__media { position: relative; display: block; overflow: hidden; aspect-ratio: 3 / 2; border-bottom: 1px solid var(--ink); background: var(--saffron); }
+  .card__media img, .card__blank { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform var(--t-fast) ease-out; }
+  .card:hover .card__media img, .card:focus-within .card__media img { transform: scale(1.03); }
+  .card__blank { display: grid; place-items: center; color: var(--pomegranate); }
+  .card__blank .display { font-family: var(--font-display); font-weight: 800; font-size: clamp(4rem, 12vw, 9rem); line-height: 1; }
+  .card__stamp {
+    position: absolute; top: var(--s-3); left: var(--s-3);
+    padding: 2px var(--s-2); background: var(--pomegranate); color: var(--paper);
+    font-size: 0.75rem; font-weight: 700; transform: rotate(-3deg);
+  }
+  .card__body { display: flex; flex-direction: column; gap: var(--s-2); padding: var(--s-4); flex: 1; }
+  .card__title { margin: 0; font-size: var(--h3); line-height: var(--lh-h3); }
+  .card--large .card__title { font-size: clamp(1.75rem, 3vw, 2.5rem); }
+  .card__title a { color: inherit; text-decoration: none; }
+  .card__title a:hover, .card__title a:focus-visible { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+  .card__title [lang="fa"] { font-family: var(--font-farsi); }
+  .card__body :global(.facts) { margin: 0; }
+  .card__lens-facts { display: none; margin: 0; color: var(--pomegranate); }
+  .card__summary { margin: 0; font-size: var(--p-small); }
+  .card--large .card__summary { font-size: var(--p); }
+  .card__tags { list-style: none; margin: auto 0 0; padding: var(--s-2) 0 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+
+  /* Lens-only facts appear when the catalogue is in that lens (set by the Work page) */
+  :global([data-lens="casting"]) .lens-casting,
+  :global([data-theme] [data-lens="casting"]) .lens-casting { display: block; }
+  :global([data-lens="programmers"]) .lens-programmers { display: block; }
+  :global([data-lens="funders"]) .lens-funders { display: block; }
+  :global([data-lens="press"]) .lens-press { display: block; }
+
+  @media (prefers-reduced-motion: reduce) { .card__stamp { transform: none; } }
+  :global(html[data-motion="reduce"]) .card__stamp { transform: none; }
+</style>

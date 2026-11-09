@@ -1,42 +1,363 @@
 ---
-// Work index: first pass. One list of every entry, newest first.
-// The curated row, Card component and filter UI come in the next stage.
+// Work index (9 Nov 2026). One catalogue, several ways in:
+// 1 saffron: title, lens intro, lens strip
+// 2 lens pin (one per lens, shown when that lens is active): screen band, touring line, funders line, press kit
+// 3 light: curated row of featured entries (Everyone lens only)
+// 4 pomegranate: threads band (Everyone lens only)
+// 5 light: filters and the whole catalogue, newest first, every tag a link, URL carries the state
+// 6 dark: the Index
+// Without JavaScript: the full catalogue shows, every tag and lens link still works as a URL
+// (the script reads the URL on load), so nothing depends on the script.
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
-import FactsLine from "../../components/FactsLine.astro";
+import Card from "../../components/Card.astro";
+import Tag from "../../components/Tag.astro";
+import LensStrip from "../../components/LensStrip.astro";
+import IndexBlock from "../../components/IndexBlock.astro";
 import { Image } from "astro:assets";
+import { ROLES, MEDIA, SETTINGS, STATUSES, LENSES } from "../../content.config";
 
 const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.data.year);
+const threads = (await getCollection("threads")).sort((a, b) => a.data.order - b.data.order);
+const threadsFor = (e: (typeof entries)[number]) =>
+  e.data.thread.map((t) => threads.find((x) => x.id === t.id)).filter(Boolean).map((t) => ({ id: t!.id, title: t!.data.title }));
+const featured = entries.filter((e) => e.data.featured);
+const touring = entries.filter((e) => e.data.status === "touring");
+const developing = entries.filter((e) => e.data.status === "R&D" || e.data.status === "in development");
+const nist = entries.filter((e) => e.data.producedByNist);
+const lensJson = JSON.stringify(LENSES);
 ---
 
-<Base title="Work · Peyvand Sadeghian" description="Performance, installation, puppetry, film and writing by Peyvand Sadeghian.">
-  <main id="main">
-    <section data-theme="light" class="section">
+<Base title="Work · Peyvand Sadeghian" description="Performance, installation, puppetry, film and writing by Peyvand Sadeghian. Browse by role, medium, setting or thread.">
+  <main id="main" class="work-page" data-lens="everyone">
+    {/* 1. Title and lenses */}
+    <section data-theme="saffron" class="section head">
       <div class="wrap">
-        <h1>Work</h1>
-        <p class="lead">Stage, screen, installation, puppetry, film and writing, newest first.</p>
-        <ul class="work-list">
-          {entries.map((entry) => (
-            <li>
-              {entry.data.image && (
-                <a href={`/work/${entry.id}/`} tabindex="-1" aria-hidden="true">
-                  <Image src={entry.data.image} alt="" widths={[480, 800]} sizes="(min-width: 600px) 480px, 100vw" class="thumb" />
+        <h1 class="display accent settle">Work</h1>
+        <p class="lead" id="lens-intro">{LENSES.everyone.intro}</p>
+        <LensStrip />
+      </div>
+    </section>
+
+    {/* 2. Lens pins */}
+    <section data-theme="dark" class="section pin" data-lens-pin="casting" hidden>
+      <div class="wrap">
+        <div class="pin__grid">
+          <div>
+            <h2>Reel</h2>
+            <div class="frame" aria-label="Showreel placeholder">
+              <p class="mono">PLACEHOLDER: captioned showreel (Vimeo or YouTube URL) goes here via VideoEmbed.</p>
+            </div>
+          </div>
+          <div>
+            <h2>Headshots</h2>
+            <p class="mono">PLACEHOLDER: two or three current headshots, photographer credited.</p>
+            <h2>Agent</h2>
+            <p>
+              Lucy Middleweek<br />
+              Middleweek Newton Talent Management<br />
+              Holy Cross Church Crypt, Cromer Street, London WC1H 8JU<br />
+              <a href="tel:+442033940079">020 3394 0079</a><br />
+              <a href="mailto:agents@mntalent.co.uk">agents@mntalent.co.uk</a>
+            </p>
+            <p class="mono"><a href="https://app.spotlight.com/3874-6753-2954">Spotlight</a> · IMDb (link to follow)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-theme="quiet" class="section pin" data-lens-pin="programmers" hidden>
+      <div class="wrap">
+        <h2>Available now</h2>
+        {touring.length > 0 ? (
+          <p class="lead">Touring: {touring.map((e, i) => <>{i > 0 && ", "}<a href={`/work/${e.id}/`}>{e.data.title}</a></>)}.</p>
+        ) : (
+          <p class="lead">Nothing is on the road at the moment. Ask about bringing a past piece back or commissioning something new.</p>
+        )}
+        {developing.length > 0 && (
+          <p>In development: {developing.map((e, i) => <>{i > 0 && ", "}<a href={`/work/${e.id}/`}>{e.data.title}</a></>)}.</p>
+        )}
+        <p class="mono">Programming enquiries: <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a> · <a href="/nist">About Nist</a></p>
+      </div>
+    </section>
+
+    <section data-theme="quiet" class="section pin" data-lens-pin="funders" hidden>
+      <div class="wrap">
+        <h2>Track record</h2>
+        <p class="lead">PLACEHOLDER: two sentences on Nist, how projects are produced, and public engagement to date. {nist.length} {nist.length === 1 ? "project is" : "projects are"} marked Produced by Nist.</p>
+        <p class="mono">Funding and partnership enquiries: <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a> · <a href="/nist">Nist</a></p>
+      </div>
+    </section>
+
+    <section data-theme="quiet" class="section pin" data-lens-pin="press" hidden>
+      <div class="wrap">
+        <h2>Press kit</h2>
+        <p class="lead">PLACEHOLDER: links to press images folder, bios at three lengths (<a href="/about">About</a>), and recent coverage.</p>
+        <p class="mono">Press enquiries: <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a></p>
+      </div>
+    </section>
+
+    {/* 3. Curated row */}
+    {featured.length > 0 && (
+      <section data-theme="light" class="section everyone-only" data-everyone-only>
+        <div class="wrap">
+          <h2 class="mono mono-caps band-title">Selected</h2>
+          <div class="curated">
+            {featured.map((e) => <Card entry={e} threads={threadsFor(e)} size="large" />)}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {/* 4. Threads band */}
+    {threads.length > 0 && (
+      <section data-theme="pomegranate" class="section everyone-only" data-everyone-only>
+        <div class="wrap">
+          <div class="band-head">
+            <h2 class="mono mono-caps band-title">Threads</h2>
+            <a class="mono" href="/work/threads/">All threads</a>
+          </div>
+          <p class="lead">Recurring questions that run across the work, whatever form it took.</p>
+          <ul class="threads" role="list">
+            {threads.map((t) => (
+              <li>
+                <a class="thread-card" href={`/work/threads/${t.id}/`}>
+                  {t.data.image && <Image src={t.data.image} alt={t.data.imageAlt ?? ""} widths={[480, 800]} sizes="(min-width: 900px) 25vw, (min-width: 600px) 50vw, 100vw" />}
+                  <span class="thread-card__title">{t.data.title}</span>
+                  <span class="mono thread-card__n">{entries.filter((e) => e.data.thread.some((x) => x.id === t.id)).length} works{t.data.placeholder && " · working title"}</span>
                 </a>
-              )}
-              <h2><a href={`/work/${entry.id}/`}>{entry.data.title}</a></h2>
-              <FactsLine data={entry.data} />
-              <p>{entry.data.summary}</p>
-            </li>
-          ))}
-        </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    {/* 5. Catalogue */}
+    <section data-theme="light" class="section catalogue">
+      <div class="wrap">
+        <div class="band-head">
+          <h2 class="mono mono-caps band-title">Everything</h2>
+          <p class="mono" id="count" aria-live="polite">{entries.length} entries</p>
+        </div>
+
+        <details class="filters" id="filters">
+          <summary class="button button--secondary">Filter</summary>
+          <div class="filters__groups">
+            <fieldset>
+              <legend class="mono mono-caps">Role</legend>
+              <div class="filters__sub">
+                <span class="mono">Performer</span>
+                <div class="filters__row">{ROLES.Performer.map((v) => <Tag group="role" value={v} />)}</div>
+              </div>
+              <div class="filters__sub">
+                <span class="mono">Maker</span>
+                <div class="filters__row">{ROLES.Maker.map((v) => <Tag group="role" value={v} />)}</div>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend class="mono mono-caps">Medium</legend>
+              <div class="filters__row">{MEDIA.map((v) => <Tag group="medium" value={v} />)}</div>
+            </fieldset>
+            <fieldset>
+              <legend class="mono mono-caps">Setting</legend>
+              <div class="filters__row">{SETTINGS.map((v) => <Tag group="setting" value={v} />)}</div>
+            </fieldset>
+            <fieldset>
+              <legend class="mono mono-caps">Status</legend>
+              <div class="filters__row">{STATUSES.map((v) => <Tag group="status" value={v} />)}</div>
+            </fieldset>
+            <fieldset>
+              <legend class="mono mono-caps">Thread</legend>
+              <div class="filters__row">{threads.map((t) => <Tag group="thread" value={t.id} label={t.data.title} />)}</div>
+            </fieldset>
+          </div>
+          <p class="filters__active mono" id="active" hidden></p>
+          <a class="button button--secondary" href="/work/" id="clear" hidden>Clear filters</a>
+        </details>
+
+        <div class="grid" id="grid">
+          {entries.map((e) => <Card entry={e} threads={threadsFor(e)} />)}
+        </div>
+        <p class="lead" id="empty" hidden>Nothing matches all of those at once. Take one filter off.</p>
+      </div>
+    </section>
+
+    {/* 6. Index */}
+    <section data-theme="dark" class="section">
+      <div class="wrap">
+        <IndexBlock entries={entries} threads={threads} />
       </div>
     </section>
   </main>
 </Base>
 
+<script is:inline id="lens-data" type="application/json" set:html={lensJson}></script>
+
 <style>
-  .work-list { list-style: none; padding: 0; margin: var(--s-8) 0 0; max-width: var(--measure); }
-  .work-list li + li { margin-top: var(--s-8); padding-top: var(--s-8); border-top: 1px solid var(--rule); }
-  .work-list h2 { margin: 0 0 var(--s-2); }
-  .thumb { display: block; width: 100%; max-width: 480px; height: auto; aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid var(--ink); margin-bottom: var(--s-4); }
+  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
+  .accent { color: var(--accent); }
+  .head .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; margin-bottom: var(--s-6); }
+  .band-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4); flex-wrap: wrap; }
+  .band-title { margin: 0 0 var(--s-6); font-weight: 700; }
+  .pin h2 { margin-top: 0; }
+  .pin__grid { display: grid; gap: var(--s-8) var(--grid-gap); }
+  @media (min-width: 900px) { .pin__grid { grid-template-columns: 3fr 2fr; } }
+  .frame { aspect-ratio: 16 / 9; display: grid; place-items: center; border: 1px solid var(--paper); padding: var(--s-4); }
+
+  .curated { display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .curated { grid-template-columns: repeat(2, 1fr); } }
+  .curated > :global(.card--large:first-child) { grid-column: 1 / -1; }
+  @media (min-width: 900px) { .curated > :global(.card--large:first-child .card__media) { aspect-ratio: 21 / 9; } }
+
+  .threads { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
+  @media (min-width: 600px) { .threads { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .threads { grid-template-columns: repeat(4, 1fr); } }
+  .thread-card { display: flex; flex-direction: column; gap: var(--s-2); color: var(--fg); text-decoration: none; border: 1px solid var(--paper); padding: var(--s-3); min-height: 100%; transition: background-color var(--t-fast); }
+  .thread-card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  .thread-card__title { font-family: var(--font-display); font-weight: 800; font-size: var(--h3); line-height: var(--lh-h3); letter-spacing: var(--track-tight); }
+  .thread-card:hover, .thread-card:focus-visible { background: var(--ink); }
+
+  .filters { margin: 0 0 var(--s-8); }
+  .filters summary { list-style: none; width: max-content; }
+  .filters summary::-webkit-details-marker { display: none; }
+  .filters__groups { display: grid; gap: var(--s-6); margin-top: var(--s-6); }
+  @media (min-width: 900px) { .filters__groups { grid-template-columns: repeat(5, auto); gap: var(--s-8); } }
+  .filters fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+  .filters legend { padding: 0; margin-bottom: var(--s-3); font-weight: 700; }
+  .filters__sub { margin-bottom: var(--s-3); }
+  .filters__sub > span { display: block; margin-bottom: var(--s-1); }
+  .filters__row { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .filters__active { margin: var(--s-6) 0 var(--s-3); }
+  #clear { margin-top: var(--s-2); }
+
+  .grid { display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
+  @media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  .grid > :global(.card) { transition: opacity var(--t-reflow), transform var(--t-reflow); }
+  @supports (transition-behavior: allow-discrete) {
+    .grid > :global(.card) { transition: opacity var(--t-reflow), transform var(--t-reflow), display var(--t-reflow) allow-discrete; }
+    .grid > :global(.card[hidden]) { display: none; opacity: 0; transform: translateY(12px); }
+    @starting-style { .grid > :global(.card) { opacity: 0; transform: translateY(12px); } }
+  }
+  #empty { margin-top: var(--s-6); }
 </style>
+
+<script>
+  // Filter and lens state lives in the URL. Groups combine with AND, values within a group with OR.
+  // A lens is a preset (content.config.ts LENSES) applied underneath the visitor's own filters.
+  type Lens = { label: string; intro: string; roles?: string[]; statuses?: string[]; nist?: boolean; press?: boolean };
+  const LENSES: Record<string, Lens> = JSON.parse(document.getElementById("lens-data")!.textContent || "{}");
+  const GROUPS = ["role", "medium", "setting", "status", "thread"] as const;
+  const main = document.querySelector<HTMLElement>(".work-page")!;
+  const grid = document.getElementById("grid")!;
+  const cards = Array.from(grid.querySelectorAll<HTMLElement>(".card"));
+  const intro = document.getElementById("lens-intro")!;
+  const countEl = document.getElementById("count")!;
+  const activeEl = document.getElementById("active")!;
+  const clear = document.getElementById("clear") as HTMLAnchorElement;
+  const empty = document.getElementById("empty")!;
+  const filters = document.getElementById("filters") as HTMLDetailsElement;
+
+  const has = (card: HTMLElement, group: string, value: string) => (card.dataset[group] || "").split("|").includes(value);
+
+  function read() {
+    const p = new URLSearchParams(location.search);
+    const lens = p.get("lens") && LENSES[p.get("lens")!] ? p.get("lens")! : "everyone";
+    const sel: Record<string, string[]> = {};
+    for (const g of GROUPS) sel[g] = p.getAll(g).filter(Boolean);
+    return { lens, sel, nist: p.get("nist") === "1" };
+  }
+
+  function write(state: ReturnType<typeof read>) {
+    const p = new URLSearchParams();
+    if (state.lens !== "everyone") p.set("lens", state.lens);
+    for (const g of GROUPS) for (const v of state.sel[g]) p.append(g, v);
+    if (state.nist) p.set("nist", "1");
+    const q = p.toString();
+    history.pushState(null, "", q ? `/work/?${q}` : "/work/");
+  }
+
+  function apply() {
+    const { lens, sel, nist } = read();
+    const L = LENSES[lens];
+    main.dataset.lens = lens;
+    grid.dataset.lens = lens;
+    intro.textContent = L.intro;
+    document.querySelectorAll<HTMLElement>("[data-lens-link]").forEach((a) => {
+      if (a.dataset.lensLink === lens) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+    });
+    document.querySelectorAll<HTMLElement>("[data-lens-pin]").forEach((s) => (s.hidden = s.dataset.lensPin !== lens));
+    const anyFilter = GROUPS.some((g) => sel[g].length) || nist;
+    document.querySelectorAll<HTMLElement>("[data-everyone-only]").forEach((s) => (s.hidden = lens !== "everyone" || anyFilter));
+
+    let shown = 0;
+    for (const c of cards) {
+      let ok = true;
+      if (L.roles && !L.roles.some((r) => has(c, "role", r))) ok = false;
+      if (L.statuses && !L.statuses.includes(c.dataset.status || "")) ok = false;
+      if (L.nist && c.dataset.nist !== "1") ok = false;
+      if (L.press && c.dataset.press !== "1") ok = false;
+      if (nist && c.dataset.nist !== "1") ok = false;
+      for (const g of GROUPS) if (sel[g].length && !sel[g].some((v) => has(c, g, v))) ok = false;
+      c.hidden = !ok;
+      if (ok) shown++;
+    }
+    countEl.textContent = `${shown} ${shown === 1 ? "entry" : "entries"}`;
+    empty.hidden = shown > 0;
+
+    // Mark pressed tags inside the filter panel and the cards
+    document.querySelectorAll<HTMLElement>(".tag[data-group]").forEach((t) => {
+      const g = t.dataset.group!, v = t.dataset.value!;
+      const on = g === "nist" ? nist : (sel[g] || []).includes(v);
+      t.setAttribute("aria-pressed", String(on));
+    });
+    const words: string[] = [];
+    for (const g of GROUPS) for (const v of sel[g]) words.push(v);
+    if (nist) words.push("Produced by Nist");
+    activeEl.hidden = words.length === 0;
+    activeEl.textContent = words.length ? `Filtering by: ${words.join(" · ")}` : "";
+    clear.hidden = !anyFilter;
+    if (anyFilter) filters.open = true;
+  }
+
+  function toggle(group: string, value: string) {
+    const state = read();
+    if (group === "nist") state.nist = !state.nist;
+    else {
+      const list = state.sel[group];
+      const i = list.indexOf(value);
+      if (i >= 0) list.splice(i, 1); else list.push(value);
+    }
+    write(state);
+    apply();
+  }
+
+  document.addEventListener("click", (e) => {
+    const a = (e.target as HTMLElement).closest("a") as HTMLAnchorElement | null;
+    if (!a) return;
+    if (a.dataset.lensLink) {
+      e.preventDefault();
+      const state = read();
+      state.lens = a.dataset.lensLink;
+      write(state); apply();
+      return;
+    }
+    const g = a.dataset.group || a.dataset.indexLink;
+    if (g && a.dataset.value !== undefined) {
+      e.preventDefault();
+      toggle(g, a.dataset.value);
+      if (a.dataset.indexLink) document.getElementById("filters")?.scrollIntoView({ block: "start" });
+      return;
+    }
+    if (a.id === "clear") {
+      e.preventDefault();
+      const state = read();
+      for (const g of GROUPS) state.sel[g] = [];
+      state.nist = false;
+      write(state); apply();
+    }
+  });
+  window.addEventListener("popstate", apply);
+  apply();
+</script>

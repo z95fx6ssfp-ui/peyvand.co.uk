@@ -1,0 +1,30 @@
+---
+// Access statement (plan step 9, design.md section 8). PLACEHOLDER sections to confirm at launch.
+import Base from "../layouts/Base.astro";
+const reviewed = new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+---
+
+<Base title="Access statement · Peyvand Sadeghian" description="What this site does to be accessible, what it does not do yet, and how to report a barrier.">
+  <main id="main">
+    <section data-theme="quiet" class="section">
+      <div class="wrap">
+        <h1>Access statement</h1>
+        <p class="lead">This site aims to meet WCAG 2.2 AA. Here is what that means in practice and where it falls short.</p>
+        <h2>What the site does</h2>
+        <ul>
+          <li>Text and background colours are checked for contrast of at least 4.5:1.</li>
+          <li>Everything works with a keyboard, and the thing in focus is always outlined.</li>
+          <li>Images have descriptions. Photographer credits sit in captions.</li>
+          <li>Videos are hosted on Vimeo or YouTube with captions, and nothing plays sound until you press play.</li>
+          <li>Nothing moves unless you scroll or hover. "Reduce motion" in the footer, or your device setting, turns off the rest.</li>
+          <li>Text can be enlarged to 200 per cent without anything breaking.</li>
+        </ul>
+        <h2>What it does not do yet</h2>
+        <p>PLACEHOLDER: list known gaps at launch (e.g. transcripts for older videos, BSL introduction).</p>
+        <h2>Tell me about a barrier</h2>
+        <p>Write to <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a>. Say which page and what happened. PLACEHOLDER: response time commitment.</p>
+        <p class="mono">Last reviewed: {reviewed}</p>
+      </div>
+    </section>
+  </main>
+</Base>

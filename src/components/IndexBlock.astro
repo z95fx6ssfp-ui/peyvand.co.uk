@@ -1,0 +1,65 @@
+---
+// Index block (9 Nov 2026): the foot of the Work page. Every vocabulary listed with
+// counts, each word a link, set in the mono face like the index of a book.
+// Counts come from the entries at build time; empty tags are left out.
+import type { CollectionEntry } from "astro:content";
+import { ROLES, MEDIA, SETTINGS, STATUSES } from "../content.config";
+
+interface Props {
+  entries: CollectionEntry<"work">[];
+  threads: CollectionEntry<"threads">[];
+}
+const { entries, threads } = Astro.props;
+
+const count = (pick: (e: CollectionEntry<"work">) => readonly string[], value: string) =>
+  entries.filter((e) => pick(e).includes(value)).length;
+
+const groups: { title: string; group: string; items: { value: string; label: string; n: number; href?: string }[] }[] = [
+  {
+    title: "Role",
+    group: "role",
+    items: [...ROLES.Performer, ...ROLES.Maker].map((v) => ({ value: v, label: v, n: count((e) => e.data.role, v) })),
+  },
+  { title: "Medium", group: "medium", items: MEDIA.map((v) => ({ value: v, label: v, n: count((e) => e.data.medium, v) })) },
+  { title: "Setting", group: "setting", items: SETTINGS.map((v) => ({ value: v, label: v, n: count((e) => e.data.setting, v) })) },
+  { title: "Status", group: "status", items: STATUSES.map((v) => ({ value: v, label: v, n: count((e) => [e.data.status], v) })) },
+  {
+    title: "Thread",
+    group: "thread",
+    items: threads
+      .sort((a, b) => a.data.order - b.data.order)
+      .map((t) => ({ value: t.id, label: t.data.title, n: count((e) => e.data.thread.map((x) => x.id), t.id), href: `/work/threads/${t.id}/` })),
+  },
+].map((g) => ({ ...g, items: g.items.filter((i) => i.n > 0) }));
+---
+
+<div class="index">
+  <h2 class="index__title">Index</h2>
+  <div class="index__cols">
+    {groups.map((g) => g.items.length > 0 && (
+      <section class="index__group">
+        <h3 class="mono mono-caps index__heading">{g.title}</h3>
+        <ul class="mono" role="list">
+          {g.items.map((i) => (
+            <li>
+              <a href={i.href ?? `/work/?${g.group}=${encodeURIComponent(i.value)}`} data-index-link={g.group} data-value={i.value}>{i.label}</a>
+              <span class="index__n" aria-label={`${i.n} ${i.n === 1 ? "entry" : "entries"}`}>{i.n}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </div>
+</div>
+
+<style>
+  .index__title { margin-top: 0; }
+  .index__cols { display: grid; gap: var(--s-8) var(--grid-gap); grid-template-columns: 1fr; }
+  @media (min-width: 600px) { .index__cols { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .index__cols { grid-template-columns: repeat(5, 1fr); } }
+  .index__heading { font-size: 0.8rem; margin: 0 0 var(--s-3); font-weight: 700; }
+  .index ul { list-style: none; margin: 0; padding: 0; }
+  .index li { display: flex; justify-content: space-between; gap: var(--s-3); padding-block: var(--s-1); border-bottom: 1px dotted currentColor; max-width: none; }
+  .index li a { display: inline-block; min-height: 28px; }
+  .index__n { opacity: 0.8; }
+</style>

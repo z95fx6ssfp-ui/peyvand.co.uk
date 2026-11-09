@@ -1,0 +1,57 @@
+---
+// Threads index (9 Nov 2026): one large card per thread, in `order`.
+import { getCollection } from "astro:content";
+import { Image } from "astro:assets";
+import Base from "../../../layouts/Base.astro";
+import LensStrip from "../../../components/LensStrip.astro";
+
+const threads = (await getCollection("threads")).sort((a, b) => a.data.order - b.data.order);
+const work = await getCollection("work");
+const countFor = (id: string) => work.filter((e) => e.data.thread.some((t) => t.id === id)).length;
+---
+
+<Base title="Threads · Work · Peyvand Sadeghian" description="Recurring questions that run across Peyvand Sadeghian's work, whatever form it took.">
+  <main id="main">
+    <section data-theme="pomegranate" class="section">
+      <div class="wrap">
+        <p class="mono crumb"><a href="/work/">Work</a></p>
+        <h1 class="display settle">Threads</h1>
+        <p class="lead">Recurring questions that run across the work, whatever form it took. Each thread gathers the pieces that belong to it.</p>
+        <nav class="tabs mono" aria-label="Work views"><a href="/work/">Catalogue</a><a href="/work/threads/" aria-current="page">Threads</a></nav>
+      </div>
+    </section>
+    <section data-theme="light" class="section">
+      <div class="wrap">
+        <ul class="list" role="list">
+          {threads.map((t) => (
+            <li>
+              <a class="row" href={`/work/threads/${t.id}/`}>
+                {t.data.image && <Image class="row__img" src={t.data.image} alt={t.data.imageAlt ?? ""} widths={[480, 800, 1200]} sizes="(min-width: 900px) 40vw, 100vw" />}
+                <span class="row__text">
+                  <span class="row__title">{t.data.title}</span>
+                  <span class="mono">{countFor(t.id)} works{t.data.placeholder && " · working title"}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
+  .crumb { margin: 0 0 var(--s-4); }
+  .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; }
+  .tabs { display: flex; gap: var(--s-4); margin-top: var(--s-6); }
+  .tabs a { display: inline-flex; align-items: center; min-height: var(--tap); padding: 0 var(--s-3); border: 1px solid var(--fg); text-decoration: none; color: var(--fg); }
+  .tabs a[aria-current="page"] { background: var(--fg); color: var(--bg); }
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--grid-gap); }
+  .row { display: grid; gap: var(--s-4); border: 1px solid var(--ink); color: var(--ink); text-decoration: none; padding: var(--s-4); transition: background-color var(--t-fast); }
+  @media (min-width: 900px) { .row { grid-template-columns: 2fr 3fr; align-items: center; } }
+  .row:hover, .row:focus-visible { background: var(--rose); }
+  .row__img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid var(--ink); }
+  .row__text { display: flex; flex-direction: column; gap: var(--s-2); }
+  .row__title { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.75rem, 4vw, 3rem); line-height: 1; letter-spacing: var(--track-tight); }
+</style>

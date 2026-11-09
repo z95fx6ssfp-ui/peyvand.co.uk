@@ -1,0 +1,53 @@
+---
+// Tag (9 Nov 2026): every tag is a link, never a label. On the Work page the
+// same markup is taken over by the filter script, which toggles the filter in
+// place and updates the URL; everywhere else the link goes to the filtered catalogue.
+// Flat Saffron block, Ink text, mono caps, no radius (a highlighter mark on paper).
+// Threads use the `thread` variant: Pomegranate text on a 1px Pomegranate border.
+interface Props {
+  group: "role" | "medium" | "setting" | "status" | "thread" | "nist";
+  value: string;
+  label?: string;
+  href?: string;
+}
+const { group, value, label = value, href } = Astro.props;
+const target =
+  href ??
+  (group === "thread"
+    ? `/work/threads/${value}/`
+    : group === "nist"
+      ? `/work/?nist=1`
+      : `/work/?${group}=${encodeURIComponent(value)}`);
+---
+
+<a class={`tag tag--${group} mono mono-caps`} href={target} data-group={group} data-value={value}>{label}</a>
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 2px var(--s-2);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: var(--ink);
+    background: var(--saffron);
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    transition: background-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
+  }
+  .tag:hover, .tag:focus-visible { background: var(--ink); color: var(--saffron); }
+  .tag--thread, .tag--nist {
+    background: transparent;
+    color: var(--accent, var(--pomegranate));
+    border-color: currentColor;
+  }
+  .tag--thread:hover, .tag--thread:focus-visible, .tag--nist:hover, .tag--nist:focus-visible {
+    background: var(--accent, var(--pomegranate));
+    color: var(--bg);
+  }
+  .tag--status { background: var(--paper); }
+  .tag--status:hover, .tag--status:focus-visible { background: var(--ink); color: var(--paper); }
+  .tag[aria-pressed="true"] { background: var(--ink); color: var(--saffron); }
+</style>

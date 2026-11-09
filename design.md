@@ -113,7 +113,7 @@ Spacing scale on a 4px base: `--s-1` 4px, `--s-2` 8px, `--s-3` 12px, `--s-4` 16p
 
 - Every section is full-bleed: its background runs edge to edge of the viewport. Inside it, a centred column with `max-width: 1200px` and a gutter of 16px under 600px, 24px to 1024px. Text columns cap at 68ch inside it; headings, quotes and galleries use the full column.
 - Section padding `--s-12` on phones, `--s-24` on desktop. Sections are separated by their colour change, not rules, except one 1px Ink rule above the footer.
-- Display sizes for entry titles and straplines: `clamp(3rem, 10vw, 8rem)`, line height 0.95, weight 800. The title is the biggest thing on the page.
+- Display sizes for entry titles and straplines: `clamp(2.25rem, 9vw, 8rem)` (the 2.25rem floor keeps "Autobiographical" inside a 390px phone), line height 0.95, weight 800. The title is the biggest thing on the page.
 - Photographs are shown large: an entry hero is full-bleed and 60 to 80vh tall; gallery tiles are at least a third of the column wide on desktop.
 - Grid: 12 columns on desktop with `--s-6` gaps; 2 columns from 600px to 900px; 1 column under 600px. Cards keep the same shape at every width.
 - Tap targets at least 44 by 44px. Buttons have 12px vertical and 24px horizontal padding, 2px corner radius, no shadow.
@@ -134,11 +134,15 @@ The build should have exactly these, each a single Astro component, each taking 
 - **Quote wall**: a `pomegranate` (or `dark`) section holding short audience and press quotes in the display face at three sizes (`clamp` from 1.5rem to 5rem), in Paper and Saffron, laid out as a flowing cloud with `flex-wrap` and uneven gaps so it reads as a poster, not a list. Each quote is a `<blockquote>` or `<q>` with its source in mono; audience quotes may be unattributed as a group ("From the audience"). Reading order in the DOM is the order a screen reader gets; the visual scatter is CSS only.
 - **Strapline block**: a `saffron` section opening with one line at display size in Pomegranate (for DUAL, "Autobiographical agitprop.") followed by the lead paragraph and the body prose in Ink at 68ch.
 - **Gallery**: a grid of photographs on a `saffron` section, three columns on desktop, two on phones, mixed portrait and landscape allowed with `grid-auto-flow: dense`; each image a `<figure>` with its own alt text, photographer in the section's caption line. No lightbox, no carousel.
-- **Card** (Work grid): image at 3:2, cropped with `object-fit: cover`, 1px Ink border, title in H3 below, facts line under it. Whole card is the link, one focus ring around it.
+- **Card** (Work grid): a framed object. Image at 3:2, cropped with `object-fit: cover`, 1px Ink border, title in H3 below, mono facts line, summary, then the tags as links (role, medium, setting, Produced by Nist, up to two threads). The title is the link; the image link is decorative (tabindex -1). A `large` variant for the curated row and thread pages; the first curated card spans the full column at 21:9 on desktop. Extra facts per lens (character and director for Casting; venue, company and "Available to tour" for Programmers; funders for Funders; review sources for Press) are rendered once and shown by CSS when the catalogue is in that lens.
 - **Quiet block**: Rose background, `--s-6` padding, used for quotes, access notes, content notes.
 - **Stamp**: a Pomegranate rotated label (minus 3 degrees) for one-word states such as "Touring", "New", "Archive". At most one per screen. Rotation is purely decorative and removed when `prefers-reduced-motion` is set, since the tilt alone does not move but the convention keeps everything calm.
 - **Figure**: image with mono caption below carrying the description and the photographer credit, "Photo: Ali Wright".
 - **Video embed**: Vimeo or YouTube iframe at 16:9 on a `dark` section, the full column wide, `loading="lazy"`, captions on by default, autoplay off, a visible title above it and a plain link below ("Watch on Vimeo") for anyone who blocks embeds. On an entry page it comes straight after the hero, not at the end.
+- **Tag** (9 Nov 2026): every tag is a link, never a label. Flat Saffron block, Ink mono caps, 1px Ink border, no radius (a highlighter mark). Thread tags and "Produced by Nist" are the outlined Pomegranate variant. On the Work page the same markup is taken over by the filter script.
+- **Lens strip** (9 Nov 2026): "Looking as" followed by one chip per lens (Everyone, Casting, Programmers, Funders, Press); the active chip is filled. Real URLs (`/work/?lens=casting`). On phones the row scrolls sideways.
+- **Thread card**: image at 3:2, thread name in the display face, count of works in mono, on the `pomegranate` threads band; 1px Paper border.
+- **Index block** (9 Nov 2026): every vocabulary with counts, mono, dotted rules between rows, each word a link; five columns on desktop, two from 600px, one on phones. On a `dark` section at the foot of Work.
 - **Footer**: dark theme, four short columns on desktop and one stack on phones: contact routes, links (Spotlight, IMDb, Instagram, TikTok, LinkedIn as text), newsletter, Access statement and "Last updated: Month Year" in mono.
 
 ## 6. Imagery and texture
@@ -153,7 +157,17 @@ The build should have exactly these, each a single Astro component, each taking 
 
 ## 7. Motion
 
-None by default. Permitted: colour and underline changes on hover and focus (150ms), the mobile menu drawer sliding in (200ms). Both are removed under `prefers-reduced-motion: reduce`. No parallax, no scroll-triggered reveals, no carousels, no video autoplay, no animated GIFs.
+Rewritten 9 Nov 2026 (the first version said "none by default"; Peyvand wants the site dynamic in how things move and are presented). The rule now: motion shows structure, never decoration. Everything is CSS, nothing loops, nothing autoplays, nothing moves while the visitor is reading. All of it is removed by `prefers-reduced-motion: reduce` and by the "Reduce motion" button in the footer (stored per browser as `html[data-motion="reduce"]`). Tokens: `--t-fast` 150ms, `--t-drawer` 200ms, `--t-reflow` 250ms, `--t-settle` 600ms, `--t-rise` 500ms; phones take 20 per cent off the last three.
+
+Permitted:
+
+1. Page to page: cross-document view transitions (`@view-transition { navigation: auto }`). A card image and the entry hero share a `view-transition-name`, so tapping a card the image grows into the hero. No JavaScript; browsers without support get an ordinary page load.
+2. Filtering and lenses: when a tag or lens is tapped, cards that leave fade and drop 12px, the rest reflow (`--t-reflow`).
+3. Hover and focus: card image scales by 3 per cent; tags and lens chips fill with their colour (`--t-fast`).
+4. A page title settles into place once on load (`.settle`, `--t-settle`): it rises 0.15em and tightens its tracking. Never repeats.
+5. Quote wall items, gallery tiles and offer cards rise 16px and fade in as they scroll into view (`.rise`, CSS scroll-driven animation with `animation-timeline: view()`), static where unsupported.
+
+Still forbidden: parallax, carousels, autoplaying video, animated GIFs, anything that moves while the visitor reads, anything that cannot be switched off.
 
 ## 8. Accessibility rules
 

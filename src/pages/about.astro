@@ -1,0 +1,83 @@
+---
+// About template (plan step 8). Three bio lengths, a practice statement in the first person,
+// a quote wall from collaborators, and the Farsi name. All PLACEHOLDER copy to be replaced.
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="About · Peyvand Sadeghian" description="Who Peyvand Sadeghian is: performer, performance maker and writer, based in London.">
+  <main id="main">
+    <section data-theme="saffron" class="section">
+      <div class="wrap">
+        <h1 class="display accent settle">About</h1>
+        <p class="lead">Peyvand Sadeghian (she/they) is a performer, performance maker and writer based in London. PLACEHOLDER: one more sentence from the short bio.</p>
+        <p lang="fa" class="farsi">پیوند</p>
+      </div>
+    </section>
+
+    <section data-theme="dark" class="section">
+      <div class="wrap">
+        <div class="two">
+          <div class="portrait" aria-label="Portrait placeholder">
+            <p class="mono">PLACEHOLDER: current portrait or headshot, photographer credited.</p>
+          </div>
+          <div class="prose">
+            <h2>Practice</h2>
+            <p>PLACEHOLDER: first-person statement, three or four paragraphs, seeded from the artist statement on the old /aboutold page. Say what the work is. Keep the terms performer and performance maker; say that she writes and that the practice is interdisciplinary.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-theme="pomegranate" class="section">
+      <div class="wrap">
+        <h2 class="mono mono-caps band-title">What collaborators say</h2>
+        <ul class="quotes" role="list">
+          <li class="rise"><q>PLACEHOLDER quote one from /aboutold</q><span class="mono"> Name, role</span></li>
+          <li class="rise"><q>PLACEHOLDER quote two</q><span class="mono"> Name, role</span></li>
+          <li class="rise"><q>PLACEHOLDER quote three</q><span class="mono"> Name, role</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section data-theme="light" class="section">
+      <div class="wrap">
+        <h2>Bios for programmes and press</h2>
+        <p class="mono">Copy the length you need. Third person.</p>
+        <h3>50 words</h3>
+        <p>PLACEHOLDER 50-word bio.</p>
+        <h3>100 words</h3>
+        <p>PLACEHOLDER 100-word bio.</p>
+        <h3>250 words</h3>
+        <p>PLACEHOLDER 250-word bio.</p>
+        <p class="mono">Press images and headshots: <a href="/work/?lens=press">Press lens</a> · Representation: Lucy Middleweek, Middleweek Newton Talent Management.</p>
+      </div>
+    </section>
+
+    <section data-theme="quiet" class="section">
+      <div class="wrap">
+        <h2>Also</h2>
+        <ul>
+          <li>Associate Lecturer, BA Acting and Performance, CCW, University of the Arts London</li>
+          <li>Amnesty International Artist Ambassador</li>
+          <li>Equity member</li>
+          <li>PLACEHOLDER: anything else from the Master CV worth a line</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
+  .accent { color: var(--accent); }
+  .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; }
+  .farsi { font-size: clamp(2rem, 5vw, 4rem); font-weight: 700; margin: var(--s-4) 0 0; text-align: left; }
+  .two { display: grid; gap: var(--s-8); }
+  @media (min-width: 900px) { .two { grid-template-columns: 2fr 3fr; } }
+  .portrait { aspect-ratio: 4 / 5; border: 1px solid var(--paper); display: grid; place-items: center; padding: var(--s-4); }
+  .prose h2 { margin-top: 0; }
+  .band-title { margin: 0 0 var(--s-8); font-weight: 700; }
+  .quotes { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-8); }
+  .quotes q { display: block; font-family: var(--font-display); font-weight: 800; font-size: clamp(1.5rem, 3.5vw, 3rem); line-height: 1.05; letter-spacing: var(--track-tight); }
+  .quotes li:nth-child(2n) q { color: var(--saffron); }
+</style>
