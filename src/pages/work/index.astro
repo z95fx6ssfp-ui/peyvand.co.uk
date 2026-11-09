@@ -231,9 +231,17 @@ const lensJson = JSON.stringify(LENSES);
   .filters__active { margin: var(--s-6) 0 var(--s-3); }
   #clear { margin-top: var(--s-2); }
 
-  .grid { display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
-  @media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  /* Catalogue: two columns on phones with compact cards (decided 3 Nov), three on desktop */
+  .grid { display: grid; gap: var(--s-3); grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 600px) { .grid { gap: var(--grid-gap); } }
   @media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 599.98px) {
+    .grid :global(.card__summary), .grid :global(.card__lens-facts) { display: none; }
+    .grid :global(.card__title) { font-size: 1.125rem; }
+    .grid :global(.card__body) { padding: var(--s-3); }
+    .grid :global(.facts) { font-size: 0.75rem; }
+    .grid :global(.tag) { font-size: 0.7rem; min-height: 24px; }
+  }
   .grid > :global(.card) { transition: opacity var(--t-reflow), transform var(--t-reflow); }
   @supports (transition-behavior: allow-discrete) {
     .grid > :global(.card) { transition: opacity var(--t-reflow), transform var(--t-reflow), display var(--t-reflow) allow-discrete; }
