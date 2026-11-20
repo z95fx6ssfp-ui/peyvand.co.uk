@@ -37,53 +37,8 @@ export const STATUSES = ["R&D", "in development", "produced", "touring", "archiv
 
 const roleValues = [...ROLES.Performer, ...ROLES.Maker] as const;
 
-// Lenses (9 Nov 2026): audience access points above the tags. A lens is a saved
-// view of the one catalogue: preset filters, extra facts on the cards, one line of
-// introduction, the right contact route. Named for people, never for forms.
-// The filter and the extra facts are read from here by the Work index and the Card,
-// so a lens changes in one place. URL: /work/?lens=casting
-export type LensKey = "everyone" | "casting" | "programmers" | "funders" | "press";
-export const LENSES: Record<
-  LensKey,
-  {
-    label: string;
-    intro: string;
-    roles?: readonly string[]; // any of these roles
-    statuses?: readonly string[]; // any of these statuses
-    nist?: boolean; // only Produced by Nist
-    press?: boolean; // only entries with press quotes
-    facts: readonly ("character" | "director" | "venue" | "company" | "funders" | "press" | "touring")[];
-  }
-> = {
-  everyone: { label: "Everyone", intro: "Stage, screen, installation, puppetry, film and writing. Browse by tag or thread.", facts: [] },
-  casting: {
-    label: "Casting",
-    intro: "Screen and stage roles. Reel, headshots and agent details are above the catalogue.",
-    roles: ROLES.Performer,
-    facts: ["character", "director"],
-  },
-  programmers: {
-    label: "Programmers",
-    intro: "Work I have made or co-made, with what is available to tour or commission.",
-    roles: ROLES.Maker,
-    statuses: ["produced", "touring"],
-    facts: ["venue", "company", "touring"],
-  },
-  funders: {
-    label: "Funders",
-    intro: "Projects produced through Nist, with partners and funders credited, plus work in research and development.",
-    nist: true,
-    statuses: ["R&D", "in development", "produced", "touring"],
-    facts: ["funders", "company"],
-  },
-  press: {
-    label: "Press",
-    intro: "Work that has been reviewed, with press quotes and sources.",
-    press: true,
-    facts: ["press", "venue"],
-  },
-};
-export const LENS_KEYS = Object.keys(LENSES) as LensKey[];
+// Lenses (9 Nov to 20 Nov 2026) are gone: visitors are not asked who they are.
+// What each lens pinned now lives on the page it belongs to (About, Work with me, Nist).
 
 const work = defineCollection({
   // Files starting with an underscore (the template) are not entries.
@@ -106,7 +61,7 @@ const work = defineCollection({
       company: z.string().optional(),
       with: z.string().optional(), // collaborators, replaces a "collaborator" tag
       director: z.string().optional(),
-      funders: z.array(z.string()).default([]), // added 9 Nov 2026 for the Funders lens
+      funders: z.array(z.string()).default([]), // credited on the entry page and the Nist page
       summary: z.string().max(200),
       image: image().optional(),
       imageAlt: z.string().optional(),

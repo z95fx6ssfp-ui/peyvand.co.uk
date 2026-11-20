@@ -1,190 +1,50 @@
 ---
-// Work index (9 Nov 2026). One catalogue, several ways in:
-// 1 saffron: title, lens intro, lens strip
-// 2 lens pin (one per lens, shown when that lens is active): screen band, touring line, funders line, press kit
-// 3 light: curated row of featured entries (Everyone lens only)
-// 4 pomegranate: threads band (Everyone lens only)
-// 5 light: filters and the whole catalogue, newest first, every tag a link, URL carries the state
-// 6 dark: the Index
-// Without JavaScript: the full catalogue shows, every tag and lens link still works as a URL
-// (the script reads the URL on load), so nothing depends on the script.
+// Work index (rebuilt 20 Nov 2026). One catalogue, newest first, and one way of narrowing it:
+// the Index at the foot of the page, where every tag is a link. Choosing a tag filters the
+// catalogue in place, shows what is chosen above it, and puts the choice in the URL so a
+// filtered view can be sent as a link. No lenses: nobody is asked who they are.
+// Two notes appear only when what is being looked at calls for them: acting tags bring up the
+// way to the reel and agent; the touring status brings up the booking route.
+// Without JavaScript the whole catalogue shows and every link still works as a URL.
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import Card from "../../components/Card.astro";
-import Tag from "../../components/Tag.astro";
-import LensStrip from "../../components/LensStrip.astro";
 import IndexBlock from "../../components/IndexBlock.astro";
-import { Image } from "astro:assets";
-import { ROLES, MEDIA, SETTINGS, STATUSES, LENSES } from "../../content.config";
+import { ROLES } from "../../content.config";
 
 const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.data.year);
 const threads = (await getCollection("threads")).sort((a, b) => a.data.order - b.data.order);
-const threadsFor = (e: (typeof entries)[number]) =>
-  e.data.thread.map((t) => threads.find((x) => x.id === t.id)).filter(Boolean).map((t) => ({ id: t!.id, title: t!.data.title }));
-const featured = entries.filter((e) => e.data.featured);
-const touring = entries.filter((e) => e.data.status === "touring");
-const developing = entries.filter((e) => e.data.status === "R&D" || e.data.status === "in development");
-const nist = entries.filter((e) => e.data.producedByNist);
-const lensJson = JSON.stringify(LENSES);
+const performer = JSON.stringify(ROLES.Performer);
 ---
 
 <Base title="Work · Peyvand Sadeghian" description="Performance, installation, puppetry, film and writing by Peyvand Sadeghian. Browse by role, medium, setting or thread.">
-  <main id="main" class="work-page" data-lens="everyone">
-    {/* 1. Title and lenses */}
+  <main id="main" class="work-page">
     <section data-theme="saffron" class="section head">
       <div class="wrap">
         <h1 class="display accent settle">Work</h1>
-        <p class="lead" id="lens-intro">{LENSES.everyone.intro}</p>
-        <LensStrip />
+        <p class="lead">Everything made and performed, newest first.</p>
+        <p class="mono jumps"><a href="#index">Browse by tag</a><a href="/work/threads/">Follow a thread</a></p>
       </div>
     </section>
 
-    {/* 2. Lens pins */}
-    <section data-theme="dark" class="section pin" data-lens-pin="casting" hidden>
+    <section data-theme="light" class="section catalogue" id="catalogue">
       <div class="wrap">
-        <div class="pin__grid">
-          <div>
-            <h2>Reel</h2>
-            <div class="frame" aria-label="Showreel placeholder">
-              <p class="mono">PLACEHOLDER: captioned showreel (Vimeo or YouTube URL) goes here via VideoEmbed.</p>
-            </div>
-          </div>
-          <div>
-            <h2>Headshots</h2>
-            <p class="mono">PLACEHOLDER: two or three current headshots, photographer credited.</p>
-            <h2>Agent</h2>
-            <p>
-              Lucy Middleweek<br />
-              Middleweek Newton Talent Management<br />
-              Holy Cross Church Crypt, Cromer Street, London WC1H 8JU<br />
-              <a href="tel:+442033940079">020 3394 0079</a><br />
-              <a href="mailto:agents@mntalent.co.uk">agents@mntalent.co.uk</a>
-            </p>
-            <p class="mono"><a href="https://app.spotlight.com/3874-6753-2954">Spotlight</a> · IMDb (link to follow)</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section data-theme="quiet" class="section pin" data-lens-pin="programmers" hidden>
-      <div class="wrap">
-        <h2>Available now</h2>
-        {touring.length > 0 ? (
-          <p class="lead">Touring: {touring.map((e, i) => <>{i > 0 && ", "}<a href={`/work/${e.id}/`}>{e.data.title}</a></>)}.</p>
-        ) : (
-          <p class="lead">Nothing is on the road at the moment. Ask about bringing a past piece back or commissioning something new.</p>
-        )}
-        {developing.length > 0 && (
-          <p>In development: {developing.map((e, i) => <>{i > 0 && ", "}<a href={`/work/${e.id}/`}>{e.data.title}</a></>)}.</p>
-        )}
-        <p class="mono">Programming enquiries: <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a> · <a href="/nist">About Nist</a></p>
-      </div>
-    </section>
-
-    <section data-theme="quiet" class="section pin" data-lens-pin="funders" hidden>
-      <div class="wrap">
-        <h2>Track record</h2>
-        <p class="lead">PLACEHOLDER: two sentences on Nist, how projects are produced, and public engagement to date. {nist.length} {nist.length === 1 ? "project is" : "projects are"} marked Produced by Nist.</p>
-        <p class="mono">Funding and partnership enquiries: <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a> · <a href="/nist">Nist</a></p>
-      </div>
-    </section>
-
-    <section data-theme="quiet" class="section pin" data-lens-pin="press" hidden>
-      <div class="wrap">
-        <h2>Press kit</h2>
-        <p class="lead">PLACEHOLDER: links to press images folder, bios at three lengths (<a href="/about">About</a>), and recent coverage.</p>
-        <p class="mono">Press enquiries: <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a></p>
-      </div>
-    </section>
-
-    {/* 3. Curated row */}
-    {featured.length > 0 && (
-      <section data-theme="light" class="section everyone-only" data-everyone-only>
-        <div class="wrap">
-          <h2 class="mono mono-caps band-title">Selected</h2>
-          <div class="curated">
-            {featured.map((e) => <Card entry={e} threads={threadsFor(e)} size="large" />)}
-          </div>
-        </div>
-      </section>
-    )}
-
-    {/* 4. Threads band */}
-    {threads.length > 0 && (
-      <section data-theme="pomegranate" class="section everyone-only" data-everyone-only>
-        <div class="wrap">
-          <div class="band-head">
-            <h2 class="mono mono-caps band-title">Threads</h2>
-            <a class="mono" href="/work/threads/">All threads</a>
-          </div>
-          <p class="lead">Recurring questions that run across the work, whatever form it took.</p>
-          <ul class="threads" role="list">
-            {threads.map((t) => (
-              <li>
-                <a class="thread-card" href={`/work/threads/${t.id}/`}>
-                  {t.data.image && <Image src={t.data.image} alt={t.data.imageAlt ?? ""} widths={[480, 800]} sizes="(min-width: 900px) 25vw, (min-width: 600px) 50vw, 100vw" />}
-                  <span class="thread-card__title">{t.data.title}</span>
-                  <span class="mono thread-card__n">{entries.filter((e) => e.data.thread.some((x) => x.id === t.id)).length} works{t.data.placeholder && " · working title"}</span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-    )}
-
-    {/* 5. Catalogue */}
-    <section data-theme="light" class="section catalogue">
-      <div class="wrap">
-        <div class="band-head">
-          <h2 class="mono mono-caps band-title">Everything</h2>
-          <p class="mono" id="count" aria-live="polite">{entries.length} entries</p>
+        <div class="status">
+          <p class="mono" id="count" aria-live="polite">{entries.length} works</p>
+          <p class="chosen mono" id="chosen" hidden></p>
         </div>
 
-        <details class="filters" id="filters">
-          <summary class="button button--secondary">Filter</summary>
-          <div class="filters__groups">
-            <fieldset>
-              <legend class="mono mono-caps">Role</legend>
-              <div class="filters__sub">
-                <span class="mono">Performer</span>
-                <div class="filters__row">{ROLES.Performer.map((v) => <Tag group="role" value={v} />)}</div>
-              </div>
-              <div class="filters__sub">
-                <span class="mono">Maker</span>
-                <div class="filters__row">{ROLES.Maker.map((v) => <Tag group="role" value={v} />)}</div>
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend class="mono mono-caps">Medium</legend>
-              <div class="filters__row">{MEDIA.map((v) => <Tag group="medium" value={v} />)}</div>
-            </fieldset>
-            <fieldset>
-              <legend class="mono mono-caps">Setting</legend>
-              <div class="filters__row">{SETTINGS.map((v) => <Tag group="setting" value={v} />)}</div>
-            </fieldset>
-            <fieldset>
-              <legend class="mono mono-caps">Status</legend>
-              <div class="filters__row">{STATUSES.map((v) => <Tag group="status" value={v} />)}</div>
-            </fieldset>
-            <fieldset>
-              <legend class="mono mono-caps">Thread</legend>
-              <div class="filters__row">{threads.map((t) => <Tag group="thread" value={t.id} label={t.data.title} />)}</div>
-            </fieldset>
-          </div>
-          <p class="filters__active mono" id="active" hidden></p>
-          <a class="button button--secondary" href="/work/" id="clear" hidden>Clear filters</a>
-        </details>
+        <p class="note" data-note="acting" hidden>Reel, headshots and agent details are on the <a href="/about#acting">About page</a>.</p>
+        <p class="note" data-note="touring" hidden>To book a touring piece, write to <a href="mailto:assistant@peyvand.co.uk">assistant@peyvand.co.uk</a>.</p>
 
         <div class="grid" id="grid">
-          {entries.map((e) => <Card entry={e} threads={threadsFor(e)} />)}
+          {entries.map((e, i) => <Card entry={e} tone={i} headingLevel="h2" />)}
         </div>
-        <p class="lead" id="empty" hidden>Nothing matches all of those at once. Take one filter off.</p>
+        <p class="lead" id="empty" hidden>Nothing has all of those tags at once. Take one off.</p>
       </div>
     </section>
 
-    {/* 6. Index */}
-    <section data-theme="dark" class="section">
+    <section data-theme="dark" class="section" id="index">
       <div class="wrap">
         <IndexBlock entries={entries} threads={threads} />
       </div>
@@ -192,56 +52,30 @@ const lensJson = JSON.stringify(LENSES);
   </main>
 </Base>
 
-<script is:inline id="lens-data" type="application/json" set:html={lensJson}></script>
+<script is:inline id="performer-roles" type="application/json" set:html={performer}></script>
 
 <style>
-  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
-  .accent { color: var(--accent); }
   .head .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; margin-bottom: var(--s-6); }
-  .band-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4); flex-wrap: wrap; }
-  .band-title { margin: 0 0 var(--s-6); font-weight: 700; }
-  .pin h2 { margin-top: 0; }
-  .pin__grid { display: grid; gap: var(--s-8) var(--grid-gap); }
-  @media (min-width: 900px) { .pin__grid { grid-template-columns: 3fr 2fr; } }
-  .frame { aspect-ratio: 16 / 9; display: grid; place-items: center; border: 1px solid var(--paper); padding: var(--s-4); }
+  .jumps { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-6); margin: 0; max-width: none; }
+  .jumps a { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }
 
-  .curated { display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
-  @media (min-width: 900px) { .curated { grid-template-columns: repeat(2, 1fr); } }
-  .curated > :global(.card--large:first-child) { grid-column: 1 / -1; }
-  @media (min-width: 900px) { .curated > :global(.card--large:first-child .card__media) { aspect-ratio: 21 / 9; } }
-
-  .threads { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
-  @media (min-width: 600px) { .threads { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 900px) { .threads { grid-template-columns: repeat(4, 1fr); } }
-  .thread-card { display: flex; flex-direction: column; gap: var(--s-2); color: var(--fg); text-decoration: none; border: 1px solid var(--paper); padding: var(--s-3); min-height: 100%; transition: background-color var(--t-fast); }
-  .thread-card img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
-  .thread-card__title { font-family: var(--font-display); font-weight: 800; font-size: var(--h3); line-height: var(--lh-h3); letter-spacing: var(--track-tight); }
-  .thread-card:hover, .thread-card:focus-visible { background: var(--ink); }
-
-  .filters { margin: 0 0 var(--s-8); }
-  .filters summary { list-style: none; width: max-content; }
-  .filters summary::-webkit-details-marker { display: none; }
-  .filters__groups { display: grid; gap: var(--s-6); margin-top: var(--s-6); }
-  @media (min-width: 900px) { .filters__groups { grid-template-columns: repeat(5, auto); gap: var(--s-8); } }
-  .filters fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
-  .filters legend { padding: 0; margin-bottom: var(--s-3); font-weight: 700; }
-  .filters__sub { margin-bottom: var(--s-3); }
-  .filters__sub > span { display: block; margin-bottom: var(--s-1); }
-  .filters__row { display: flex; flex-wrap: wrap; gap: var(--s-2); }
-  .filters__active { margin: var(--s-6) 0 var(--s-3); }
-  #clear { margin-top: var(--s-2); }
-
-  /* Catalogue: two columns on phones with compact cards (decided 3 Nov), three on desktop */
-  .grid { display: grid; gap: var(--s-3); grid-template-columns: repeat(2, 1fr); }
-  @media (min-width: 600px) { .grid { gap: var(--grid-gap); } }
-  @media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 599.98px) {
-    .grid :global(.card__summary), .grid :global(.card__lens-facts) { display: none; }
-    .grid :global(.card__title) { font-size: 1.125rem; }
-    .grid :global(.card__body) { padding: var(--s-3); }
-    .grid :global(.facts) { font-size: 0.75rem; }
-    .grid :global(.tag) { font-size: 0.7rem; min-height: 24px; }
+  .status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-6); margin-bottom: var(--s-6); min-height: var(--tap); }
+  .status p { margin: 0; max-width: none; }
+  .chosen { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }
+  .chosen :global(button) {
+    display: inline-flex; align-items: center; gap: var(--s-2);
+    min-height: 36px; padding: 2px var(--s-3);
+    background: var(--saffron); color: var(--ink); border: 1px solid var(--ink); border-radius: 0;
+    font: inherit; font-weight: 700; cursor: pointer;
   }
+  .chosen :global(button:hover) { background: var(--ink); color: var(--saffron); }
+  .chosen :global(a) { margin-left: var(--s-2); }
+  .note { margin: 0 0 var(--s-6); padding: var(--s-3) var(--s-4); background: var(--rose); border-left: 4px solid var(--pomegranate); max-width: none; }
+
+  /* Two columns on phones, three on desktop */
+  .grid { display: grid; gap: var(--s-8) var(--s-3); grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 600px) { .grid { gap: var(--s-12) var(--grid-gap); } }
+  @media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
   .grid > :global(.card) { transition: opacity var(--t-reflow), transform var(--t-reflow); }
   @supports (transition-behavior: allow-discrete) {
     .grid > :global(.card) { transition: opacity var(--t-reflow), transform var(--t-reflow), display var(--t-reflow) allow-discrete; }
@@ -252,34 +86,27 @@ const lensJson = JSON.stringify(LENSES);
 </style>
 
 <script>
-  // Filter and lens state lives in the URL. Groups combine with AND, values within a group with OR.
-  // A lens is a preset (content.config.ts LENSES) applied underneath the visitor's own filters.
-  type Lens = { label: string; intro: string; roles?: string[]; statuses?: string[]; nist?: boolean; press?: boolean };
-  const LENSES: Record<string, Lens> = JSON.parse(document.getElementById("lens-data")!.textContent || "{}");
-  const GROUPS = ["role", "medium", "setting", "status", "thread"] as const;
-  const main = document.querySelector<HTMLElement>(".work-page")!;
+  // The chosen tags live in the URL. Groups combine with AND, words within a group with OR.
+  const GROUPS = ["role", "medium", "setting", "status"] as const;
+  const PERFORMER: string[] = JSON.parse(document.getElementById("performer-roles")!.textContent || "[]");
   const grid = document.getElementById("grid")!;
   const cards = Array.from(grid.querySelectorAll<HTMLElement>(".card"));
-  const intro = document.getElementById("lens-intro")!;
   const countEl = document.getElementById("count")!;
-  const activeEl = document.getElementById("active")!;
-  const clear = document.getElementById("clear") as HTMLAnchorElement;
+  const chosenEl = document.getElementById("chosen")!;
   const empty = document.getElementById("empty")!;
-  const filters = document.getElementById("filters") as HTMLDetailsElement;
+  const catalogue = document.getElementById("catalogue")!;
 
   const has = (card: HTMLElement, group: string, value: string) => (card.dataset[group] || "").split("|").includes(value);
 
   function read() {
     const p = new URLSearchParams(location.search);
-    const lens = p.get("lens") && LENSES[p.get("lens")!] ? p.get("lens")! : "everyone";
     const sel: Record<string, string[]> = {};
     for (const g of GROUPS) sel[g] = p.getAll(g).filter(Boolean);
-    return { lens, sel, nist: p.get("nist") === "1" };
+    return { sel, nist: p.get("nist") === "1" };
   }
 
   function write(state: ReturnType<typeof read>) {
     const p = new URLSearchParams();
-    if (state.lens !== "everyone") p.set("lens", state.lens);
     for (const g of GROUPS) for (const v of state.sel[g]) p.append(g, v);
     if (state.nist) p.set("nist", "1");
     const q = p.toString();
@@ -287,46 +114,53 @@ const lensJson = JSON.stringify(LENSES);
   }
 
   function apply() {
-    const { lens, sel, nist } = read();
-    const L = LENSES[lens];
-    main.dataset.lens = lens;
-    grid.dataset.lens = lens;
-    intro.textContent = L.intro;
-    document.querySelectorAll<HTMLElement>("[data-lens-link]").forEach((a) => {
-      if (a.dataset.lensLink === lens) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
-    });
-    document.querySelectorAll<HTMLElement>("[data-lens-pin]").forEach((s) => (s.hidden = s.dataset.lensPin !== lens));
-    const anyFilter = GROUPS.some((g) => sel[g].length) || nist;
-    document.querySelectorAll<HTMLElement>("[data-everyone-only]").forEach((s) => (s.hidden = lens !== "everyone" || anyFilter));
+    const { sel, nist } = read();
+    const any = GROUPS.some((g) => sel[g].length) || nist;
 
     let shown = 0;
     for (const c of cards) {
       let ok = true;
-      if (L.roles && !L.roles.some((r) => has(c, "role", r))) ok = false;
-      if (L.statuses && !L.statuses.includes(c.dataset.status || "")) ok = false;
-      if (L.nist && c.dataset.nist !== "1") ok = false;
-      if (L.press && c.dataset.press !== "1") ok = false;
       if (nist && c.dataset.nist !== "1") ok = false;
       for (const g of GROUPS) if (sel[g].length && !sel[g].some((v) => has(c, g, v))) ok = false;
       c.hidden = !ok;
       if (ok) shown++;
     }
-    countEl.textContent = `${shown} ${shown === 1 ? "entry" : "entries"}`;
+    countEl.textContent = any ? `${shown} of ${cards.length} works` : `${cards.length} works`;
     empty.hidden = shown > 0;
 
-    // Mark pressed tags inside the filter panel and the cards
-    document.querySelectorAll<HTMLElement>(".tag[data-group]").forEach((t) => {
-      const g = t.dataset.group!, v = t.dataset.value!;
+    // What is chosen, each word a button that takes it off again
+    chosenEl.textContent = "";
+    if (any) {
+      const add = (group: string, value: string, label: string) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.dataset.group = group;
+        b.dataset.value = value;
+        b.textContent = `${label} ×`;
+        b.setAttribute("aria-label", `Remove ${label}`);
+        chosenEl.append(b);
+      };
+      for (const g of GROUPS) for (const v of sel[g]) add(g, v, v);
+      if (nist) add("nist", "1", "Produced by Nist");
+      const clear = document.createElement("a");
+      clear.href = "/work/";
+      clear.id = "clear";
+      clear.textContent = "Show everything";
+      chosenEl.append(clear);
+    }
+    chosenEl.hidden = !any;
+
+    // Mark the chosen words in the Index
+    document.querySelectorAll<HTMLElement>("[data-index-link]").forEach((a) => {
+      const g = a.dataset.indexLink!, v = a.dataset.value!;
       const on = g === "nist" ? nist : (sel[g] || []).includes(v);
-      t.setAttribute("aria-pressed", String(on));
+      if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
     });
-    const words: string[] = [];
-    for (const g of GROUPS) for (const v of sel[g]) words.push(v);
-    if (nist) words.push("Produced by Nist");
-    activeEl.hidden = words.length === 0;
-    activeEl.textContent = words.length ? `Filtering by: ${words.join(" · ")}` : "";
-    clear.hidden = !anyFilter;
-    if (anyFilter) filters.open = true;
+
+    // Notes that follow what is being looked at
+    const acting = sel.role.some((r) => PERFORMER.includes(r)) || sel.medium.some((m) => m === "film" || m === "television");
+    document.querySelector<HTMLElement>('[data-note="acting"]')!.hidden = !acting;
+    document.querySelector<HTMLElement>('[data-note="touring"]')!.hidden = !sel.status.includes("touring");
   }
 
   function toggle(group: string, value: string) {
@@ -334,6 +168,7 @@ const lensJson = JSON.stringify(LENSES);
     if (group === "nist") state.nist = !state.nist;
     else {
       const list = state.sel[group];
+      if (!list) return;
       const i = list.indexOf(value);
       if (i >= 0) list.splice(i, 1); else list.push(value);
     }
@@ -342,28 +177,21 @@ const lensJson = JSON.stringify(LENSES);
   }
 
   document.addEventListener("click", (e) => {
-    const a = (e.target as HTMLElement).closest("a") as HTMLAnchorElement | null;
-    if (!a) return;
-    if (a.dataset.lensLink) {
+    const el = (e.target as HTMLElement).closest<HTMLElement>("a, button");
+    if (!el) return;
+    if (el.id === "clear") {
       e.preventDefault();
-      const state = read();
-      state.lens = a.dataset.lensLink;
-      write(state); apply();
+      history.pushState(null, "", "/work/");
+      apply();
       return;
     }
-    const g = a.dataset.group || a.dataset.indexLink;
-    if (g && a.dataset.value !== undefined) {
+    const group = el.dataset.indexLink || (el.closest("#chosen") ? el.dataset.group : undefined);
+    if (group && group !== "thread" && el.dataset.value !== undefined) {
       e.preventDefault();
-      toggle(g, a.dataset.value);
-      if (a.dataset.indexLink) document.getElementById("filters")?.scrollIntoView({ block: "start" });
-      return;
-    }
-    if (a.id === "clear") {
-      e.preventDefault();
-      const state = read();
-      for (const g of GROUPS) state.sel[g] = [];
-      state.nist = false;
-      write(state); apply();
+      toggle(group, el.dataset.value);
+      if (el.dataset.indexLink) {
+        catalogue.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.dataset.motion === "reduce" ? "auto" : "smooth" });
+      }
     }
   });
   window.addEventListener("popstate", apply);

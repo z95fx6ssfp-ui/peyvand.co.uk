@@ -1,0 +1,219 @@
+---
+// Thread run (20 Nov 2026): works strung along one drawn line. The line is drawn as the
+// visitor scrolls and each work comes forward as it is reached. Used on the homepage
+// (selected work) and on every thread page (that thread's work, in its own line style).
+// Phones: one column, the line runs down the left edge through a knot beside each title.
+// Desktop: picture and text swap sides at each stop, so the line swings across the page.
+// Without JavaScript, or with motion reduced: the whole line is simply there.
+import type { CollectionEntry } from "astro:content";
+import WorkImage from "./WorkImage.astro";
+import { splitTitle, years } from "../lib/threads";
+
+interface Props {
+  entries: CollectionEntry<"work">[];
+  id: string; // unique on the page, used for the SVG mask
+  colour?: string;
+  dash?: string;
+  start?: string; // CSS selector of the element the line starts from (optional)
+  end?: string; // CSS selector of the element the line ends at (optional)
+  headingLevel?: "h2" | "h3";
+  transition?: boolean;
+}
+const { entries, id, colour = "var(--pomegranate)", dash = "", start, end, headingLevel = "h2", transition = true } = Astro.props;
+const Heading = headingLevel;
+---
+
+<div class="run" data-thread-run data-start={start} data-end={end} style={`--thread: ${colour}`}>
+  <svg class="run__svg" aria-hidden="true" focusable="false">
+    <defs>
+      <mask id={`reveal-${id}`} maskUnits="userSpaceOnUse">
+        <path class="run__reveal" fill="none" stroke="#fff" stroke-width="16" stroke-linecap="round" />
+      </mask>
+    </defs>
+    <path class="run__ghost" fill="none" stroke-linecap="round" />
+    <path class="run__draw" fill="none" stroke-linecap="round" stroke-dasharray={dash || undefined} mask={`url(#reveal-${id})`} />
+  </svg>
+  <ol class="run__list" role="list">
+    {entries.map((e, i) => {
+      const { latin, farsi } = splitTitle(e.data.title);
+      const href = `/work/${e.id}/`;
+      return (
+        <li class="station">
+          <a class="station__media" href={href} tabindex="-1" aria-hidden="true">
+            <WorkImage entry={e} tone={i} widths={[480, 800, 1200, 1600]} sizes="(min-width: 900px) 58vw, 100vw" eager={i === 0} transition={transition} />
+          </a>
+          <div class="station__text">
+            <span class="knot" data-knot aria-hidden="true"></span>
+            <p class="mono station__year">{years(e.data)}</p>
+            <Heading class="station__title">
+              <a href={href}>
+                <span>{latin}</span>
+                {farsi && <>{" "}<span lang="fa" dir="rtl">{farsi}</span></>}
+              </a>
+            </Heading>
+            <p class="station__summary">{e.data.summary}</p>
+            <p class="mono station__forms">{e.data.medium.join(", ")}</p>
+          </div>
+        </li>
+      );
+    })}
+  </ol>
+</div>
+
+<style>
+  .run { position: relative; }
+  .run__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
+  .run__ghost { stroke: var(--thread); stroke-width: 2; stroke-dasharray: 1 9; opacity: 0.45; }
+  .run__draw { stroke: var(--thread); stroke-width: 3.5; }
+  :global(html:not(.js)) .run::before { content: ""; position: absolute; left: 7px; top: 0; bottom: 0; border-left: 3px solid var(--thread); }
+
+  .run__list { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(72px, 14vh, 168px); position: relative; }
+  .station { display: grid; gap: var(--s-6); max-width: none; position: relative; }
+  .station__media { display: block; text-decoration: none; aspect-ratio: 3 / 2; overflow: hidden; border: 1px solid var(--ink); background: var(--saffron); }
+  .station__media :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms ease-out; }
+  .station:hover .station__media :global(img), .station:focus-within .station__media :global(img) { transform: scale(1.04); }
+  .station__text { position: relative; z-index: 2; padding-left: 34px; }
+  .knot {
+    position: absolute; left: 0; top: 0.1em;
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 3.5px solid var(--thread);
+    background: var(--bg);
+    transition: background-color 250ms, transform 250ms;
+  }
+  .station.is-reached .knot { background: var(--thread); transform: scale(1.2); }
+  .station__year { margin: 0 0 var(--s-2); }
+  .station__title { margin: 0 0 var(--s-3); font-size: clamp(2rem, 5.2vw, 4.5rem); line-height: 0.95; }
+  .station__title a { color: inherit; text-decoration: none; }
+  .station__title a:hover, .station__title a:focus-visible { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 6px; text-decoration-color: var(--thread); }
+  .station__title [lang="fa"] { font-family: var(--font-farsi); display: inline-block; line-height: 1.15; }
+  .station__summary { margin: 0 0 var(--s-3); font-size: var(--p); max-width: 46ch; }
+  .station__forms { margin: 0; }
+
+  @media (min-width: 900px) {
+    .station { grid-template-columns: repeat(12, 1fr); column-gap: var(--grid-gap); align-items: center; }
+    .station__media { grid-column: 1 / span 7; grid-row: 1; }
+    .station__text { grid-column: 8 / span 5; grid-row: 1; }
+    .station:nth-child(even) .station__media { grid-column: 6 / span 7; }
+    .station:nth-child(even) .station__text { grid-column: 1 / span 5; }
+  }
+
+  /* Each picture comes forward as it enters the screen. Static where the browser cannot do it. */
+  @supports (animation-timeline: view()) {
+    .station__media { animation: approach linear both; animation-timeline: view(); animation-range: entry 0% cover 42%; }
+  }
+  @keyframes approach {
+    from { transform: scale(0.8); opacity: 0.3; }
+    to { transform: none; opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .station__media { animation: none; } }
+  :global(html[data-motion="reduce"]) .station__media { animation: none; }
+</style>
+
+<script>
+  // Draws each run's line through its knots and reveals it as far as the visitor has scrolled.
+  const reduced = () =>
+    matchMedia("(prefers-reduced-motion: reduce)").matches || document.documentElement.dataset.motion === "reduce";
+
+  document.querySelectorAll<HTMLElement>("[data-thread-run]").forEach((run) => {
+    const ghost = run.querySelector<SVGPathElement>(".run__ghost")!;
+    const draw = run.querySelector<SVGPathElement>(".run__draw")!;
+    const reveal = run.querySelector<SVGPathElement>(".run__reveal")!;
+    const mask = run.querySelector<SVGMaskElement>("mask")!;
+    const stations = Array.from(run.querySelectorAll<HTMLElement>(".station"));
+    let table: [number, number][] = [];
+    let total = 0;
+    let knotYs: number[] = [];
+
+    const build = () => {
+      const box = run.getBoundingClientRect();
+      const at = (el: Element) => {
+        const r = el.getBoundingClientRect();
+        return { x: r.left + r.width / 2 - box.left, y: r.top + r.height / 2 - box.top };
+      };
+      const knotEls = Array.from(run.querySelectorAll<HTMLElement>("[data-knot]"));
+      const knots = knotEls.map(at);
+      if (!knots.length) return;
+      const startEl = run.dataset.start ? document.querySelector(run.dataset.start) : null;
+      const endEl = run.dataset.end ? document.querySelector(run.dataset.end) : null;
+      // Through each knot, then straight down the edge of that work's text to just below it,
+      // so the line swings across pictures and gaps and never across words.
+      const pts: { x: number; y: number }[] = [startEl ? at(startEl) : { x: knots[0].x, y: 0 }];
+      knotEls.forEach((el, i) => {
+        const text = el.parentElement!.getBoundingClientRect();
+        pts.push(knots[i], { x: knots[i].x, y: text.bottom - box.top + 14 });
+      });
+      pts.push(endEl ? at(endEl) : { x: knots[knots.length - 1].x, y: box.height });
+      const sway = Math.min(56, box.width * 0.07);
+      const keep = (x: number) => Math.max(6, Math.min(box.width - 6, x));
+      let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+      for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i];
+        const dy = b.y - a.y;
+        if (i % 2 === 0 && i < pts.length - 1) {
+          // Knot to the foot of its text: straight down
+          d += ` L ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+        } else if (Math.abs(b.x - a.x) < 48) {
+          // Nearly straight down: let the line sway to one side, then the other
+          const s = i % 4 === 1 ? sway : -sway;
+          d += ` C ${keep(a.x + s).toFixed(1)} ${(a.y + dy / 3).toFixed(1)}, ${keep(b.x + s).toFixed(1)} ${(a.y + (2 * dy) / 3).toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+        } else {
+          // A swing across the page: leave and arrive vertically
+          d += ` C ${a.x.toFixed(1)} ${(a.y + dy * 0.6).toFixed(1)}, ${b.x.toFixed(1)} ${(a.y + dy * 0.4).toFixed(1)}, ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+        }
+      }
+      [ghost, draw, reveal].forEach((p) => p.setAttribute("d", d));
+      total = reveal.getTotalLength();
+      table = [];
+      const steps = 320;
+      for (let k = 0; k <= steps; k++) {
+        const len = (total * k) / steps;
+        table.push([reveal.getPointAtLength(len).y, len]);
+      }
+      const top = Math.min(0, pts[0].y) - 40;
+      mask.setAttribute("x", "-40");
+      mask.setAttribute("y", String(top));
+      mask.setAttribute("width", String(box.width + 80));
+      mask.setAttribute("height", String(Math.max(box.height, pts[pts.length - 1].y) - top + 40));
+      reveal.style.strokeDasharray = `${total} ${total}`;
+      knotYs = knots.map((k) => k.y);
+      update();
+    };
+
+    const update = () => {
+      if (!total) return;
+      if (reduced()) {
+        reveal.style.strokeDashoffset = "0";
+        stations.forEach((s) => s.classList.add("is-reached"));
+        return;
+      }
+      const y = window.innerHeight * 0.62 - run.getBoundingClientRect().top;
+      let len = 0;
+      for (const [py, l] of table) {
+        if (py <= y) len = l;
+        else break;
+      }
+      reveal.style.strokeDashoffset = String(total - len);
+      stations.forEach((s, i) => s.classList.toggle("is-reached", knotYs[i] <= y + 2));
+    };
+
+    let ticking = false;
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          update();
+        });
+      },
+      { passive: true },
+    );
+    new ResizeObserver(build).observe(run);
+    document.fonts?.ready.then(build);
+    window.addEventListener("load", build);
+    // The footer's "Reduce motion" button changes html[data-motion]
+    new MutationObserver(update).observe(document.documentElement, { attributes: true, attributeFilter: ["data-motion"] });
+    build();
+  });
+</script>

@@ -5,7 +5,6 @@
 // Protect with Cloudflare Access (plan step 9); until then it is simply unlinked and noindex.
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
-import { LENSES, LENS_KEYS } from "../content.config";
 
 const entries = (await getCollection("work")).sort((a, b) => b.data.year - a.data.year);
 const threads = (await getCollection("threads")).sort((a, b) => a.data.order - b.data.order);
@@ -32,17 +31,6 @@ const rows: Row[] = entries.map((e) => {
   return { id: e.id, title: d.title, year: d.year, gaps, placeholders: /PLACEHOLDER/i.test(body) || !!placeholderImage, threads: d.thread.map((t) => t.id) };
 });
 
-const lensCounts = LENS_KEYS.map((k) => {
-  const L = LENSES[k];
-  const n = entries.filter((e) => {
-    if (L.roles && !L.roles.some((r) => e.data.role.includes(r as never))) return false;
-    if (L.statuses && !L.statuses.includes(e.data.status)) return false;
-    if (L.nist && !e.data.producedByNist) return false;
-    if (L.press && !e.data.pressQuotes.length) return false;
-    return true;
-  }).length;
-  return { key: k, label: L.label, n };
-});
 const notion = "https://app.notion.com/p/5b102617b3e54cb7b5340c464558a82e";
 ---
 
@@ -86,19 +74,13 @@ const notion = "https://app.notion.com/p/5b102617b3e54cb7b5340c464558a82e";
             ))}
           </ul>
         </div>
-        <div>
-          <h2>Lenses</h2>
-          <ul class="mono plain">
-            {lensCounts.map((l) => <li><a href={`/work/?lens=${l.key}`}>{l.label}</a> · {l.n} entries</li>)}
-          </ul>
-        </div>
       </div>
     </section>
 
     <section data-theme="light" class="section">
       <div class="wrap">
         <h2>Pages with placeholder copy</h2>
-        <p class="mono">Home · About · Work with me · Nist · Contact (form provider) · Access · Privacy · Work lens pins (reel, headshots, track record, press kit). Search the repo for PLACEHOLDER to see them all.</p>
+        <p class="mono">Home · About · Work with me · Nist · Contact (form provider) · Access · Privacy. On About: reel, headshots, press images. Search the repo for PLACEHOLDER to see them all.</p>
       </div>
     </section>
   </main>

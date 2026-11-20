@@ -1,14 +1,17 @@
 ---
 // One page per Work entry. Bold template, 6 Nov 2026 (design.md sections 4 and 5):
 // hero photograph with the title over it, trailer, quote wall, strapline and prose on
-// Saffron, press quotes on Ink, gallery on Saffron, credits and links on Paper,
-// connected work on Rose. Sections that have no content are left out.
+// Saffron, press quotes on Ink, gallery on Saffron, links on Paper.
+// 20 Nov 2026: tags moved from the hero to the foot of the page as plain links ("Filed under"),
+// and the page now ends by handing the visitor on: each thread this work is on leads to the
+// next work along it, then connected work. Sections that have no content are left out.
 import { getCollection, render } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import FactsLine from "../../components/FactsLine.astro";
 import VideoEmbed from "../../components/VideoEmbed.astro";
 import { Image } from "astro:assets";
-import Tag from "../../components/Tag.astro";
+import WorkImage from "../../components/WorkImage.astro";
+import { splitTitle, tagHref, threadStyle, years } from "../../lib/threads";
 
 export async function getStaticPaths() {
   const entries = await getCollection("work");
@@ -25,18 +28,45 @@ const connected = d.connected.map((id) => all.find((e) => e.id === id)).filter(B
 // gets lang="fa" and the right face (design.md section 8).
 const farsi = d.title.match(/[؀-ۿ][؀-ۿ\s‌]*/);
 const latin = farsi ? d.title.replace(farsi[0], "").trim() : d.title;
+// The placeholder file counts as no photograph: the page opens on a saffron block instead.
+const realImage = d.image && !/placeholder/.test(d.image.src);
 const hasBody = headings.length > 0 || entry.body?.trim();
-const allThreads = await getCollection("threads");
+const allThreads = (await getCollection("threads")).sort((a, b) => a.data.order - b.data.order);
 const threads = d.thread.map((t) => allThreads.find((x) => x.id === t.id)).filter(Boolean);
+
+// Where the page hands the visitor on. For each thread this work is on: the next work along
+// it (oldest to newest, wrapping round). Then connected work, then, if there is still nothing,
+// the next work in the catalogue. A work is offered once; if two threads lead to the same
+// work, both threads are named on it.
+type Onward = { entry: (typeof all)[number]; via: { title: string; id?: string; colour: string; dash: string }[] };
+const onward: Onward[] = [];
+const offer = (entry: (typeof all)[number], via: Onward["via"][number]) => {
+  if (entry.id === Astro.props.entry.id) return;
+  const found = onward.find((o) => o.entry.id === entry.id);
+  if (found) found.via.push(via);
+  else onward.push({ entry, via: [via] });
+};
+for (const t of threads) {
+  const along = all.filter((e) => e.data.thread.some((x) => x.id === t!.id)).sort((a, b) => a.data.year - b.data.year);
+  if (along.length < 2) continue;
+  const next = along[(along.findIndex((e) => e.id === entry.id) + 1) % along.length];
+  const style = threadStyle(allThreads.findIndex((x) => x.id === t!.id));
+  offer(next, { title: t!.data.title, id: t!.id, colour: style.colour, dash: style.dash });
+}
+for (const c of connected) if (!onward.some((o) => o.entry.id === c!.id)) offer(c!, { title: "Connected work", colour: "var(--ink)", dash: "" });
+if (onward.length === 0 && all.length > 1) {
+  const byYear = [...all].sort((a, b) => b.data.year - a.data.year);
+  offer(byYear[(byYear.findIndex((e) => e.id === entry.id) + 1) % byYear.length], { title: "Next in the catalogue", colour: "var(--ink)", dash: "" });
+}
 ---
 
 <Base title={`${d.title} · Peyvand Sadeghian`} description={d.summary}>
   <main id="main">
     <article>
       {/* 1. Hero */}
-      {d.image ? (
+      {realImage ? (
         <section class="hero" data-theme="dark">
-          <Image class="hero-img" src={d.image} alt={d.imageAlt ?? ""} widths={[800, 1200, 1600, 2400]} sizes="100vw" loading="eager" fetchpriority="high" style={`view-transition-name: work-${entry.id}`} />
+          <Image class="hero-img" src={d.image!} alt={d.imageAlt ?? ""} widths={[800, 1200, 1600, 2400]} sizes="100vw" loading="eager" fetchpriority="high" style={`view-transition-name: work-${entry.id}`} />
           <div class="hero-text">
             <div class="wrap">
               <p class="mono crumb"><a href="/work/">Work</a></p>
@@ -46,13 +76,6 @@ const threads = d.thread.map((t) => allThreads.find((x) => x.id === t.id)).filte
               </h1>
               <FactsLine data={d} />
               {d.photographer && <p class="mono credit">Photo: {d.photographer}</p>}
-              <ul class="tags" role="list">
-                {d.role.map((r) => <li><Tag group="role" value={r} /></li>)}
-                {d.medium.map((m) => <li><Tag group="medium" value={m} /></li>)}
-                {d.setting.map((x) => <li><Tag group="setting" value={x} /></li>)}
-                {d.producedByNist && <li><Tag group="nist" value="nist" label="Produced by Nist" /></li>}
-                {threads.map((t) => <li><Tag group="thread" value={t!.id} label={t!.data.title} /></li>)}
-              </ul>
             </div>
           </div>
         </section>
@@ -65,13 +88,6 @@ const threads = d.thread.map((t) => allThreads.find((x) => x.id === t.id)).filte
               {farsi && <span lang="fa" dir="rtl">{farsi[0].trim()}</span>}
             </h1>
             <FactsLine data={d} />
-            <ul class="tags" role="list">
-              {d.role.map((r) => <li><Tag group="role" value={r} /></li>)}
-              {d.medium.map((m) => <li><Tag group="medium" value={m} /></li>)}
-              {d.setting.map((x) => <li><Tag group="setting" value={x} /></li>)}
-              {d.producedByNist && <li><Tag group="nist" value="nist" label="Produced by Nist" /></li>}
-              {threads.map((t) => <li><Tag group="thread" value={t!.id} label={t!.data.title} /></li>)}
-            </ul>
           </div>
         </section>
       )}
@@ -165,19 +181,56 @@ const threads = d.thread.map((t) => allThreads.find((x) => x.id === t.id)).filte
         </section>
       )}
 
-      {/* 8. Connected work */}
-      {connected.length > 0 && (
-        <section data-theme="quiet" class="section">
+      {/* 8. Tags, at the foot, as links */}
+      <section data-theme="light" class="section filed">
+        <div class="wrap">
+          <h2 class="filed__title">Filed under</h2>
+          <ul class="filed__list mono" role="list">
+            {d.role.map((r) => <li><a href={tagHref("role", r)}>{r}</a></li>)}
+            {d.medium.map((m) => <li><a href={tagHref("medium", m)}>{m}</a></li>)}
+            {d.setting.map((x) => <li><a href={tagHref("setting", x)}>{x}</a></li>)}
+            {d.status !== "produced" && <li><a href={tagHref("status", d.status)}>{d.status}</a></li>}
+            {d.producedByNist && <li><a href="/work/?nist=1">Produced by Nist</a></li>}
+          </ul>
+          {threads.length > 0 && (
+            <p class="filed__threads mono">
+              {threads.length === 1 ? "Thread: " : "Threads: "}
+              {threads.map((t, i) => <>{i > 0 && ", "}<a href={`/work/threads/${t!.id}/`}>{t!.data.title}</a></>)}
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* 9. Onward: the page ends by leading somewhere */}
+      {onward.length > 0 && (
+        <section data-theme="quiet" class="section onward">
           <div class="wrap">
-            <h2>Connected work</h2>
-            <ul class="connected">
-              {connected.map((c) => (
-                <li>
-                  <a href={`/work/${c.id}/`}>{c.data.title}</a>
-                  <FactsLine data={c.data} />
-                </li>
-              ))}
+            <h2 class="onward__title">Keep following</h2>
+            <ul class={`onward__list onward__list--${Math.min(onward.length, 3)}`} role="list">
+              {onward.map((o, i) => {
+                const t = splitTitle(o.entry.data.title);
+                return (
+                  <li>
+                    <a class="onward__link" href={`/work/${o.entry.id}/`}>
+                      <svg class="onward__line" viewBox="0 0 400 24" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+                        <path d="M0 12 C 60 -4, 110 28, 180 12 S 320 -2, 400 12" fill="none" stroke={o.via[0].colour} stroke-width="3.5" stroke-linecap="round" stroke-dasharray={o.via[0].dash || undefined} vector-effect="non-scaling-stroke" />
+                      </svg>
+                      <span class="onward__via mono">
+                        {o.via.map((v, k) => <>{k > 0 && " and "}{v.title}</>)}
+                        {o.via[0].id ? " continues with" : ""}
+                      </span>
+                      <span class="onward__name">
+                        <span>{t.latin}</span>
+                        {t.farsi && <>{" "}<span lang="fa" dir="rtl">{t.farsi}</span></>}
+                      </span>
+                      <span class="onward__media"><WorkImage entry={o.entry} tone={i + 1} widths={[480, 800, 1200]} sizes="(min-width: 900px) 45vw, 100vw" /></span>
+                      <span class="onward__facts mono">{years(o.entry.data)}<span aria-hidden="true"> · </span>{o.entry.data.medium.join(", ")}</span>
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
+            <p class="onward__all mono"><a href="/work/">All the work</a><a href="/work/threads/">See how it connects</a></p>
           </div>
         </section>
       )}
@@ -212,9 +265,8 @@ const threads = d.thread.map((t) => allThreads.find((x) => x.id === t.id)).filte
     background: linear-gradient(to top, var(--ink) 0%, var(--ink) 45%, rgba(26, 26, 26, 0.75) 72%, rgba(26, 26, 26, 0) 100%);
   }
   .hero-text .display { color: var(--saffron); }
-  .hero--plain { padding: var(--s-16) 0 var(--s-8); }
+  .hero.hero--plain { min-height: 0; padding: 148px 0 var(--s-8); }
   .crumb { margin: 0 0 var(--s-4); }
-  .tags { list-style: none; margin: var(--s-4) 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
   .credit { margin: var(--s-2) 0 0; opacity: 0.85; }
 
   /* 3. Quote wall: a poster, not a list. DOM order is reading order; sizes are CSS only. */
@@ -257,9 +309,38 @@ const threads = d.thread.map((t) => allThreads.find((x) => x.id === t.id)).filte
   .gallery img { width: 100%; height: 100%; object-fit: cover; border: 1px solid var(--ink); }
   .gallery figcaption { position: absolute; left: 0; bottom: 0; padding: var(--s-1) var(--s-2); background: var(--ink); color: var(--paper); font-size: 0.75rem; }
 
-  /* 7 and 8 */
+  /* 7. Links */
   .links { list-style: none; padding: 0; margin: var(--s-4) 0 0; }
   .links li + li { margin-top: var(--s-2); }
-  .connected { list-style: none; padding: 0; margin: var(--s-4) 0 0; }
-  .connected li + li { margin-top: var(--s-4); }
+
+  /* 8. Tags at the foot */
+  .filed { padding-block: var(--s-12); border-top: 1px solid var(--ink); }
+  .filed__title { margin: 0 0 var(--s-3); font-size: var(--h3); }
+  .filed__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0 var(--s-6); }
+  .filed__list li { max-width: none; }
+  .filed__list a, .filed__threads a { display: inline-flex; align-items: center; min-height: var(--tap); }
+  .filed__threads { margin: var(--s-2) 0 0; max-width: none; }
+
+  /* 9. Onward */
+  .onward__title { margin: 0 0 var(--s-8); font-size: clamp(2.25rem, 7vw, 5.5rem); line-height: 0.95; color: var(--pomegranate); }
+  .onward__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-12) var(--grid-gap); }
+  .onward__list li { max-width: none; }
+  @media (min-width: 900px) {
+    .onward__list--2 { grid-template-columns: repeat(2, 1fr); }
+    .onward__list--3 { grid-template-columns: repeat(3, 1fr); }
+    .onward__list--1 .onward__link { grid-template-columns: 2fr 3fr; column-gap: var(--s-12); }
+    .onward__list--1 .onward__line { grid-column: 1 / -1; }
+    .onward__list--1 .onward__media { grid-column: 2; grid-row: 2 / span 4; }
+  }
+  .onward__link { display: grid; gap: var(--s-2); color: var(--ink); text-decoration: none; align-content: start; }
+  .onward__line { width: 100%; height: 24px; overflow: visible; }
+  .onward__via { font-weight: 700; }
+  .onward__name { font-family: var(--font-display); font-weight: 800; font-size: clamp(2rem, 5vw, 4rem); line-height: 0.95; letter-spacing: var(--track-tight); }
+  .onward__name [lang="fa"] { font-family: var(--font-farsi); display: inline-block; line-height: 1.15; }
+  .onward__link:hover .onward__name, .onward__link:focus-visible .onward__name { text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 6px; text-decoration-color: var(--pomegranate); }
+  .onward__media { display: block; aspect-ratio: 3 / 2; overflow: hidden; border: 1px solid var(--ink); margin-top: var(--s-2); }
+  .onward__media :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms ease-out; }
+  .onward__link:hover .onward__media :global(img) { transform: scale(1.04); }
+  .onward__all { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-6); margin: var(--s-12) 0 0; max-width: none; }
+  .onward__all a { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 700; }
 </style>

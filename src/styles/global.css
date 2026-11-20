@@ -231,6 +231,54 @@ html[data-motion="reduce"]::view-transition-group(*),
 html[data-motion="reduce"]::view-transition-old(*),
 html[data-motion="reduce"]::view-transition-new(*) { animation: none !important; }
 
+/* 11. Floating header and Threads button (20 Nov 2026) */
+html.menu-open { overflow: hidden; }
+/* The first block of a page clears the floating header */
+html.js main > section:first-child:not(.hero),
+html.js main > article > section:first-child:not(.hero) { padding-top: calc(var(--section-pad) + 72px); }
+[id] { scroll-margin-top: 96px; }
+
+.threads-button {
+  position: fixed;
+  right: var(--gutter);
+  bottom: max(var(--s-4), env(safe-area-inset-bottom));
+  z-index: 55;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 48px;
+  padding: 0 var(--s-4) 0 var(--s-3);
+  background: var(--ink);
+  color: var(--saffron);
+  border: 1px solid var(--saffron);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: var(--track-h4);
+  text-decoration: none;
+  transition: background-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
+}
+.threads-button:hover { background: var(--saffron); color: var(--ink); border-color: var(--ink); }
+.threads-button:focus-visible { outline: 3px solid var(--firoozeh); outline-offset: 2px; box-shadow: 0 0 0 2px var(--paper); }
+@media (max-width: 599.98px) { .threads-button { min-height: 44px; font-size: 0.9375rem; padding: 0 var(--s-3) 0 var(--s-2); } }
+/* The footer's last line stays readable above the button */
+.site-footer { padding-bottom: calc(var(--s-12) + 56px) !important; }
+@media print { .threads-button, .site-header__toggle { display: none; } }
+
+/* 12. Display type, shared (was repeated per page) */
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--display);
+  line-height: 0.95;
+  letter-spacing: var(--track-tight);
+  margin: 0 0 var(--s-4);
+  max-width: none;
+  overflow-wrap: anywhere;
+}
+.accent { color: var(--accent); }
+
 /* Two buttons side by side */
 .buttons { display: flex; flex-wrap: wrap; gap: var(--s-3); }
 .button + .button { margin-inline-start: var(--s-3); }

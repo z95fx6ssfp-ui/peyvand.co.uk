@@ -1,10 +1,11 @@
 ---
-// Thread page (9 Nov 2026): pomegranate hero with the thread's name at display size
-// and Peyvand's first-person text, then the works in the thread as large cards, newest first.
+// Thread page (9 Nov 2026, rebuilt 20 Nov): pomegranate opening with the thread's name at
+// display size and Peyvand's first-person text, then the works strung along the thread's own
+// line, oldest to newest, drawn as the visitor scrolls (ThreadRun). Ends with the other threads.
 import { getCollection, render } from "astro:content";
-import { Image } from "astro:assets";
 import Base from "../../../layouts/Base.astro";
-import Card from "../../../components/Card.astro";
+import ThreadRun from "../../../components/ThreadRun.astro";
+import { threadStyle } from "../../../lib/threads";
 
 export async function getStaticPaths() {
   const threads = await getCollection("threads");
@@ -12,35 +13,29 @@ export async function getStaticPaths() {
 }
 const { thread } = Astro.props;
 const { Content } = await render(thread);
-const allThreads = await getCollection("threads");
+const allThreads = (await getCollection("threads")).sort((a, b) => a.data.order - b.data.order);
 const work = (await getCollection("work"))
   .filter((e) => e.data.thread.some((t) => t.id === thread.id))
-  .sort((a, b) => b.data.year - a.data.year);
-const threadsFor = (e: (typeof work)[number]) =>
-  e.data.thread.map((t) => allThreads.find((x) => x.id === t.id)).filter(Boolean).map((t) => ({ id: t!.id, title: t!.data.title }));
-const others = allThreads.filter((t) => t.id !== thread.id).sort((a, b) => a.data.order - b.data.order);
+  .sort((a, b) => a.data.year - b.data.year);
+const style = threadStyle(allThreads.findIndex((t) => t.id === thread.id));
+const others = allThreads.filter((t) => t.id !== thread.id);
 ---
 
 <Base title={`${thread.data.title} · Threads · Peyvand Sadeghian`} description={`Work by Peyvand Sadeghian in the thread ${thread.data.title}.`}>
   <main id="main">
-    <section data-theme="pomegranate" class="section hero">
-      <div class="wrap hero__grid">
-        <div>
-          <p class="mono crumb"><a href="/work/">Work</a> · <a href="/work/threads/">Threads</a></p>
-          <h1 class="display settle">{thread.data.title}</h1>
-          {thread.data.placeholder && <p class="mono note">Working title. Peyvand's own name and words for this thread are still to come.</p>}
-          <div class="prose lead"><Content /></div>
-        </div>
-        {thread.data.image && <Image class="hero__img" src={thread.data.image} alt={thread.data.imageAlt ?? ""} widths={[480, 800, 1200]} sizes="(min-width: 900px) 40vw, 100vw" />}
+    <section data-theme="pomegranate" class="section top">
+      <div class="wrap">
+        <p class="mono crumb"><a href="/work/threads/">Threads</a></p>
+        <h1 class="display settle">{thread.data.title}</h1>
+        {thread.data.placeholder && <p class="mono note">Working title. Peyvand's own name and words for this thread are still to come.</p>}
+        <div class="prose lead"><Content /></div>
+        <p class="mono count">{work.length} {work.length === 1 ? "work" : "works"}, oldest first</p>
       </div>
     </section>
 
-    <section data-theme="light" class="section">
+    <section data-theme="light" class="run-section">
       <div class="wrap">
-        <h2 class="mono mono-caps band-title">{work.length} {work.length === 1 ? "work" : "works"} in this thread</h2>
-        <div class="grid">
-          {work.map((e) => <Card entry={e} threads={threadsFor(e).filter((t) => t.id !== thread.id)} size="large" />)}
-        </div>
+        <ThreadRun entries={work} id="thread" colour={style.colour} dash={style.dash} />
       </div>
     </section>
 
@@ -48,9 +43,10 @@ const others = allThreads.filter((t) => t.id !== thread.id).sort((a, b) => a.dat
       <section data-theme="quiet" class="section">
         <div class="wrap">
           <h2>Other threads</h2>
-          <ul class="others mono" role="list">
+          <ul class="others" role="list">
             {others.map((t) => <li><a href={`/work/threads/${t.id}/`}>{t.data.title}</a></li>)}
           </ul>
+          <p class="mono"><a href="/work/threads/">See how they connect</a></p>
         </div>
       </section>
     )}
@@ -58,15 +54,13 @@ const others = allThreads.filter((t) => t.id !== thread.id).sort((a, b) => a.dat
 </Base>
 
 <style>
-  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
   .crumb { margin: 0 0 var(--s-4); }
+  .crumb a { display: inline-flex; align-items: center; min-height: var(--tap); }
   .note { margin: 0 0 var(--s-4); opacity: 0.9; }
-  .hero__grid { display: grid; gap: var(--s-8); align-items: end; }
-  @media (min-width: 900px) { .hero__grid { grid-template-columns: 3fr 2fr; } }
-  .hero__img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid var(--paper); }
   .prose.lead :global(p) { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; max-width: var(--measure); }
-  .band-title { margin: 0 0 var(--s-6); font-weight: 700; }
-  .grid { display: grid; gap: var(--grid-gap); grid-template-columns: 1fr; }
-  @media (min-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-  .others { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: var(--s-3) var(--s-6); }
+  .count { margin: var(--s-6) 0 0; }
+  .run-section { padding: 0 0 clamp(72px, 14vh, 168px); }
+  .run-section :global(.run__list) { padding-top: clamp(72px, 14vh, 168px); }
+  .others { list-style: none; padding: 0; margin: 0 0 var(--s-6); display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-8); }
+  .others a { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.5rem, 3vw, 2.25rem); letter-spacing: var(--track-tight); color: var(--ink); }
 </style>

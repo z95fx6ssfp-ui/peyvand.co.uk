@@ -1,0 +1,64 @@
+---
+// The picture for a work, wherever it appears small or large (20 Nov 2026).
+// With a real photograph: the photograph. Without one (no image, or the placeholder file):
+// a colour block with the title set large, so a page of work in progress still looks finished.
+// The block's colours rotate by `tone` so neighbours differ.
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import { splitTitle } from "../lib/threads";
+
+interface Props {
+  entry: CollectionEntry<"work">;
+  widths?: number[];
+  sizes?: string;
+  tone?: number;
+  eager?: boolean;
+  transition?: boolean; // carries the view-transition-name (one per page per work)
+}
+const { entry, widths = [480, 800, 1200], sizes = "100vw", tone = 0, eager = false, transition = false } = Astro.props;
+const d = entry.data;
+const real = d.image && !/placeholder/.test(d.image.src);
+const { latin } = splitTitle(d.title);
+---
+
+{real ? (
+  <Image
+    src={d.image!}
+    alt=""
+    widths={widths}
+    sizes={sizes}
+    loading={eager ? "eager" : "lazy"}
+    style={transition ? `view-transition-name: work-${entry.id}` : undefined}
+  />
+) : (
+  <div class={`blank blank--${tone % 3}`} aria-hidden="true" style={transition ? `view-transition-name: work-${entry.id}` : undefined}>
+    <span class="blank__title">{latin}</span>
+    <span class="blank__note mono">Image to come</span>
+  </div>
+)}
+
+<style>
+  .blank {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(12px, 4%, 32px);
+    container-type: inline-size;
+    text-decoration: none;
+    overflow: hidden;
+  }
+  .blank--0 { background: var(--saffron); color: var(--pomegranate); }
+  .blank--1 { background: var(--pomegranate); color: var(--saffron); }
+  .blank--2 { background: var(--firoozeh); color: var(--paper); }
+  .blank__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.5rem, 17cqi, 9rem);
+    line-height: 0.9;
+    letter-spacing: var(--track-tight);
+    overflow-wrap: anywhere;
+  }
+  .blank__note { font-size: 0.75rem; text-transform: uppercase; letter-spacing: var(--track-caps); }
+</style>

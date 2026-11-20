@@ -26,7 +26,7 @@ thread: []
 
 featured: false            # true = appears in the curated row at the top of Work and on the homepage
 producedByNist: false      # true = "Produced by Nist" in the facts line and on the Nist page
-# funders: ["Arts Council England", "Tamasha"]   # shown on the Funders lens and on the page
+# funders: ["Arts Council England", "Tamasha"]   # credited on the page
 
 # FACTS LINE. Everything below is optional; whatever you fill in is assembled automatically.
 # character: "Coral"                      # for acting roles: shows as "as Coral"

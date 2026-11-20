@@ -23,7 +23,9 @@ const { title, description = "" } = Astro.props;
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="generator" content={Astro.generator} />
     <script is:inline>
-      // Apply the footer's "Reduce motion" choice before anything paints (design.md section 7).
+      // Mark that scripts run (the header floats and the menu folds away only then), and
+      // apply the footer's "Reduce motion" choice before anything paints (design.md section 7).
+      document.documentElement.classList.add("js");
       try { if (localStorage.getItem("motion") === "reduce") document.documentElement.dataset.motion = "reduce"; } catch (e) {}
     </script>
   </head>
@@ -32,5 +34,15 @@ const { title, description = "" } = Astro.props;
     <Header />
     <slot />
     <Footer />
+    {/* The way into the thread map from every page (design.md section 5, "Threads button") */}
+    {Astro.url.pathname.replace(/\/$/, "") !== "/work/threads" && (
+    <a class="threads-button" href="/work/threads/">
+      <svg viewBox="0 0 28 28" width="22" height="22" aria-hidden="true" focusable="false">
+        <path d="M3 21 C 9 3, 13 25, 15 13 S 22 5, 25 9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+        <circle cx="3" cy="21" r="2.6" fill="currentColor" /><circle cx="15" cy="13" r="2.6" fill="currentColor" /><circle cx="25" cy="9" r="2.6" fill="currentColor" />
+      </svg>
+      <span>Threads</span>
+    </a>
+    )}
   </body>
 </html>

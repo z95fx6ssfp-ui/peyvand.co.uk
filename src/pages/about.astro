@@ -28,6 +28,35 @@ import Base from "../layouts/Base.astro";
       </div>
     </section>
 
+    {/* Acting: reel, headshots, agent. Moved here from the Work page's Casting lens, 20 Nov 2026.
+        The Work page points here whenever someone is looking at acting, film or television tags. */}
+    <section data-theme="light" class="section" id="acting">
+      <div class="wrap">
+        <h2 class="acting-title">Acting</h2>
+        <div class="acting">
+          <div>
+            <h3>Reel</h3>
+            <div class="frame" aria-label="Showreel placeholder">
+              <p class="mono">PLACEHOLDER: captioned showreel (Vimeo or YouTube URL) goes here via VideoEmbed.</p>
+            </div>
+          </div>
+          <div>
+            <h3>Headshots</h3>
+            <p class="mono">PLACEHOLDER: two or three current headshots, photographer credited.</p>
+            <h3>Agent</h3>
+            <p>
+              Lucy Middleweek<br />
+              Middleweek Newton Talent Management<br />
+              Holy Cross Church Crypt, Cromer Street, London WC1H 8JU<br />
+              <a href="tel:+442033940079">020 3394 0079</a><br />
+              <a href="mailto:agents@mntalent.co.uk">agents@mntalent.co.uk</a>
+            </p>
+            <p class="mono"><a href="https://app.spotlight.com/3874-6753-2954">Spotlight</a> · IMDb (link to follow) · <a href="/work/?role=actor">Acting credits</a></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section data-theme="pomegranate" class="section">
       <div class="wrap">
         <h2 class="mono mono-caps band-title">What collaborators say</h2>
@@ -49,7 +78,7 @@ import Base from "../layouts/Base.astro";
         <p>PLACEHOLDER 100-word bio.</p>
         <h3>250 words</h3>
         <p>PLACEHOLDER 250-word bio.</p>
-        <p class="mono">Press images and headshots: <a href="/work/?lens=press">Press lens</a> · Representation: Lucy Middleweek, Middleweek Newton Talent Management.</p>
+        <p class="mono">PLACEHOLDER: link to a folder of press images, each with its credit.</p>
       </div>
     </section>
 
@@ -68,8 +97,12 @@ import Base from "../layouts/Base.astro";
 </Base>
 
 <style>
-  .display { font-family: var(--font-display); font-weight: 800; font-size: var(--display); line-height: 0.95; letter-spacing: var(--track-tight); margin: 0 0 var(--s-4); }
-  .accent { color: var(--accent); }
+  .acting-title { margin: 0 0 var(--s-6); font-size: clamp(2rem, 5vw, 3.75rem); line-height: 0.95; }
+  .acting { display: grid; gap: var(--s-8) var(--grid-gap); }
+  @media (min-width: 900px) { .acting { grid-template-columns: 3fr 2fr; } }
+  .acting h3 { margin-top: 0; }
+  .acting h3 + p + h3 { margin-top: var(--s-6); }
+  .frame { aspect-ratio: 16 / 9; display: grid; place-items: center; border: 1px solid var(--ink); padding: var(--s-4); }
   .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; }
   .farsi { font-size: clamp(2rem, 5vw, 4rem); font-weight: 700; margin: var(--s-4) 0 0; text-align: left; }
   .two { display: grid; gap: var(--s-8); }

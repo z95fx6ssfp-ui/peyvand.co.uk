@@ -19,11 +19,12 @@ The files in this repo are generated from Notion. Editing them directly still wo
 - The file name becomes the web address: `toto-kerblammo.md` is `/work/toto-kerblammo/`. Lower case, hyphens, no spaces.
 - `imageAlt` is the description a screen reader gives instead of the picture. One sentence. Leave it empty ("") only while the placeholder is in use.
 
-## Threads, lenses and tags (added 9 Nov 2026)
+## Threads and tags (rewritten 20 Nov 2026)
 
-- **Tags** are links everywhere. Tapping one on a card or an entry page opens the Work page filtered to that tag; tapping one on the Work page toggles it. The web address carries the filters, so a filtered view can be sent to someone (e.g. `/work/?medium=puppetry`).
-- **Threads** are the recurring questions that run across the work. Each is a file in `src/content/threads/` (copy `_template.md` there), with a short first-person text as the body. An entry joins a thread by listing the thread's file name under `thread:` (two at most). Threads have their own pages at `/work/threads/`.
-- **Lenses** are ways in for different visitors: Casting, Programmers, Funders, Press. They are defined once in `src/content.config.ts` (`LENSES`) and need no work per entry beyond correct tags, `producedByNist` and `funders`. Send a lens as a link: `/work/?lens=casting`.
+- **Tags** are links at the foot of things. On a work's page they are listed under "Filed under"; on the Work page they are the Index at the bottom. Choosing one shows the catalogue filtered to that word, and the web address carries the choice, so a filtered view can be sent to someone (e.g. `/work/?medium=puppetry`).
+- **Threads** are the recurring questions that run across the work. Each is a file in `src/content/threads/` (copy `_template.md` there), with a short first-person text as the body. An entry joins a thread by listing the thread's file name under `thread:` (two at most). Each thread has its own page, drawn as a line through its works, and `/work/threads/` is the map of all of them. The line styles are given out automatically in `order`.
+- **How visitors move**: the homepage follows one line through the `featured` works; every work's page ends by leading to the next work on each of its threads; the Threads button (bottom right, every page) opens the map. So the two things that decide where people are led are `featured` and `thread`.
+- **There are no lenses any more** (removed 20 Nov 2026). Nobody is asked whether they are casting, a programmer or a funder. Reel, headshots and agent are on About; offers on Work with me; funders on each work's page and on Nist.
 - **Studio**: `/studio` is a private status page listing every entry's gaps (no image, no quotes, no thread and so on). Nothing is edited there; it points back to Notion.
 
 ## What goes where

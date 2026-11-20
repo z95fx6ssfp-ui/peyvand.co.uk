@@ -7,9 +7,6 @@ import Base from "../layouts/Base.astro";
 import Card from "../components/Card.astro";
 
 const entries = (await getCollection("work")).filter((e) => e.data.producedByNist).sort((a, b) => b.data.year - a.data.year);
-const threads = await getCollection("threads");
-const threadsFor = (e: (typeof entries)[number]) =>
-  e.data.thread.map((t) => threads.find((x) => x.id === t.id)).filter(Boolean).map((t) => ({ id: t!.id, title: t!.data.title }));
 ---
 
 <Base title="Nist · Peyvand Sadeghian" description="Nist is Peyvand Sadeghian's interdisciplinary company, based at Bernie Grant Arts Centre, Tottenham.">
@@ -43,7 +40,7 @@ const threadsFor = (e: (typeof entries)[number]) =>
           <a href="/work/?nist=1">See all in Work</a>
         </div>
         {entries.length > 0 ? (
-          <div class="grid">{entries.map((e) => <Card entry={e} threads={threadsFor(e)} />)}</div>
+          <div class="grid">{entries.map((e) => <Card entry={e} />)}</div>
         ) : (
           <p class="lead">No entries are marked Produced by Nist yet. Tick the box in Notion on the projects Nist produced and sync.</p>
         )}

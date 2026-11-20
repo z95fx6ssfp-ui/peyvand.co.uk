@@ -67,7 +67,7 @@
   /* Motion (design.md section 7, rewritten 9 Nov 2026: motion shows structure, never decoration) */
   --t-fast: 150ms;
   --t-drawer: 200ms;
-  --t-reflow: 250ms;   /* cards leaving and reflowing when a filter or lens changes */
+  --t-reflow: 250ms;   /* cards leaving and reflowing when a tag is chosen */
   --t-settle: 600ms;   /* a title settling into place once on load */
   --t-rise: 500ms;     /* quotes and gallery tiles rising into view on scroll */
   --rise: 16px;

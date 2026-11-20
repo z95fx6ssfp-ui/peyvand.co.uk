@@ -1,9 +1,11 @@
 ---
-// Index block (9 Nov 2026): the foot of the Work page. Every vocabulary listed with
-// counts, each word a link, set in the mono face like the index of a book.
-// Counts come from the entries at build time; empty tags are left out.
+// Index (9 Nov 2026, restyled 20 Nov): the foot of the Work page. Every tag is a link, set
+// in the mono face like the index of a book, with how many works carry it. On the Work page
+// a tag filters the catalogue in place; thread names go to that thread's page.
+// Counts come from the entries at build time; tags no work carries are left out.
 import type { CollectionEntry } from "astro:content";
 import { ROLES, MEDIA, SETTINGS, STATUSES } from "../content.config";
+import { tagHref } from "../lib/threads";
 
 interface Props {
   entries: CollectionEntry<"work">[];
@@ -14,19 +16,20 @@ const { entries, threads } = Astro.props;
 const count = (pick: (e: CollectionEntry<"work">) => readonly string[], value: string) =>
   entries.filter((e) => pick(e).includes(value)).length;
 
-const groups: { title: string; group: string; items: { value: string; label: string; n: number; href?: string }[] }[] = [
+type Item = { value: string; label: string; n: number; href: string };
+const groups: { title: string; group: string; items: Item[] }[] = [
   {
     title: "Role",
     group: "role",
-    items: [...ROLES.Performer, ...ROLES.Maker].map((v) => ({ value: v, label: v, n: count((e) => e.data.role, v) })),
+    items: [...ROLES.Performer, ...ROLES.Maker].map((v) => ({ value: v, label: v, n: count((e) => e.data.role, v), href: tagHref("role", v) })),
   },
-  { title: "Medium", group: "medium", items: MEDIA.map((v) => ({ value: v, label: v, n: count((e) => e.data.medium, v) })) },
-  { title: "Setting", group: "setting", items: SETTINGS.map((v) => ({ value: v, label: v, n: count((e) => e.data.setting, v) })) },
-  { title: "Status", group: "status", items: STATUSES.map((v) => ({ value: v, label: v, n: count((e) => [e.data.status], v) })) },
+  { title: "Medium", group: "medium", items: MEDIA.map((v) => ({ value: v, label: v, n: count((e) => e.data.medium, v), href: tagHref("medium", v) })) },
+  { title: "Setting", group: "setting", items: SETTINGS.map((v) => ({ value: v, label: v, n: count((e) => e.data.setting, v), href: tagHref("setting", v) })) },
+  { title: "Status", group: "status", items: STATUSES.map((v) => ({ value: v, label: v, n: count((e) => [e.data.status], v), href: tagHref("status", v) })) },
   {
     title: "Thread",
     group: "thread",
-    items: threads
+    items: [...threads]
       .sort((a, b) => a.data.order - b.data.order)
       .map((t) => ({ value: t.id, label: t.data.title, n: count((e) => e.data.thread.map((x) => x.id), t.id), href: `/work/threads/${t.id}/` })),
   },
@@ -35,15 +38,16 @@ const groups: { title: string; group: string; items: { value: string; label: str
 
 <div class="index">
   <h2 class="index__title">Index</h2>
+  <p class="index__lead">Choose a word to see the work it belongs to.</p>
   <div class="index__cols">
     {groups.map((g) => g.items.length > 0 && (
       <section class="index__group">
-        <h3 class="mono mono-caps index__heading">{g.title}</h3>
+        <h3 class="mono index__heading">{g.title}</h3>
         <ul class="mono" role="list">
           {g.items.map((i) => (
             <li>
-              <a href={i.href ?? `/work/?${g.group}=${encodeURIComponent(i.value)}`} data-index-link={g.group} data-value={i.value}>{i.label}</a>
-              <span class="index__n" aria-label={`${i.n} ${i.n === 1 ? "entry" : "entries"}`}>{i.n}</span>
+              <a href={i.href} data-index-link={g.group} data-value={i.value}>{i.label}</a>
+              <span class="index__n" aria-label={`${i.n} ${i.n === 1 ? "work" : "works"}`}>{i.n}</span>
             </li>
           ))}
         </ul>
@@ -53,13 +57,14 @@ const groups: { title: string; group: string; items: { value: string; label: str
 </div>
 
 <style>
-  .index__title { margin-top: 0; }
-  .index__cols { display: grid; gap: var(--s-8) var(--grid-gap); grid-template-columns: 1fr; }
-  @media (min-width: 600px) { .index__cols { grid-template-columns: repeat(2, 1fr); } }
+  .index__title { margin: 0 0 var(--s-2); font-size: clamp(2.5rem, 7vw, 5rem); line-height: 0.95; color: var(--saffron); }
+  .index__lead { margin: 0 0 var(--s-8); }
+  .index__cols { display: grid; gap: var(--s-8) var(--grid-gap); grid-template-columns: repeat(2, 1fr); }
   @media (min-width: 900px) { .index__cols { grid-template-columns: repeat(5, 1fr); } }
-  .index__heading { font-size: 0.8rem; margin: 0 0 var(--s-3); font-weight: 700; }
+  .index__heading { font-size: 0.875rem; margin: 0 0 var(--s-3); font-weight: 700; letter-spacing: 0; opacity: 0.85; }
   .index ul { list-style: none; margin: 0; padding: 0; }
-  .index li { display: flex; justify-content: space-between; gap: var(--s-3); padding-block: var(--s-1); border-bottom: 1px dotted currentColor; max-width: none; }
-  .index li a { display: inline-block; min-height: 28px; }
+  .index li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); border-bottom: 1px dotted currentColor; max-width: none; }
+  .index li a { display: inline-flex; align-items: center; min-height: 40px; }
+  .index li a[aria-current="true"] { background: var(--saffron); color: var(--ink); padding-inline: var(--s-2); text-decoration: none; font-weight: 700; }
   .index__n { opacity: 0.8; }
 </style>
