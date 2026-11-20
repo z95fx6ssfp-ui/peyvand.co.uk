@@ -251,7 +251,7 @@ html.js main > article > section:first-child:not(.hero) { padding-top: calc(var(
   background: var(--ink);
   color: var(--saffron);
   border: 1px solid var(--saffron);
-  border-radius: 999px;
+  border-radius: var(--radius); /* square, like everything else (design.md section 4) */
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1rem;
