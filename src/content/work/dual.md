@@ -6,7 +6,8 @@ role: ["lead artist", "writer", "performer"]
 medium: ["theatre", "puppetry", "writing", "animation", "drag", "performance art"]
 setting: ["live"]
 status: produced
-thread: ["iran-and-the-diaspora", "puppets-and-objects"]
+thread: ["diasporic"]
+themes: ["Iran"]
 featured: true
 venue: "Vault Festival 2020, UK tour 2023: Pleasance Dome (Edinburgh Fringe), HOME Manchester, Camden People's Theatre London"
 company: "Co-commissioned by Camden People's Theatre and HOME"

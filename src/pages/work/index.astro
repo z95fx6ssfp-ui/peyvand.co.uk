@@ -17,7 +17,7 @@ const threads = (await getCollection("threads")).sort((a, b) => a.data.order - b
 const performer = JSON.stringify(ROLES.Performer);
 ---
 
-<Base title="Work · Peyvand Sadeghian" description="Performance, installation, puppetry, film and writing by Peyvand Sadeghian. Browse by role, medium, setting or thread.">
+<Base title="Work · Peyvand Sadeghian" description="Performance, installation, puppetry, film and writing by Peyvand Sadeghian. Browse by role, medium, theme, setting or thread.">
   <main id="main" class="work-page">
     <section data-theme="saffron" class="section head">
       <div class="wrap">
@@ -87,7 +87,7 @@ const performer = JSON.stringify(ROLES.Performer);
 
 <script>
   // The chosen tags live in the URL. Groups combine with AND, words within a group with OR.
-  const GROUPS = ["role", "medium", "setting", "status"] as const;
+  const GROUPS = ["role", "medium", "themes", "setting", "status"] as const;
   const PERFORMER: string[] = JSON.parse(document.getElementById("performer-roles")!.textContent || "[]");
   const grid = document.getElementById("grid")!;
   const cards = Array.from(grid.querySelectorAll<HTMLElement>(".card"));

@@ -121,6 +121,7 @@ if (onward.length === 0 && all.length > 1) {
           {d.strapline && <p class="display accent strap">{d.strapline}</p>}
           <p class="lead">{d.summary}</p>
           {d.funders.length > 0 && <p class="mono">Funded and supported by {d.funders.join(", ")}</p>}
+          {d.access && <p class="access-note"><strong>Access.</strong> {d.access} <a href="/access#in-the-work">Access across the work</a></p>}
           {hasBody && (
             <div class="prose">
               <Content />
@@ -188,6 +189,7 @@ if (onward.length === 0 && all.length > 1) {
           <ul class="filed__list mono" role="list">
             {d.role.map((r) => <li><a href={tagHref("role", r)}>{r}</a></li>)}
             {d.medium.map((m) => <li><a href={tagHref("medium", m)}>{m}</a></li>)}
+            {d.themes.map((t) => <li><a href={tagHref("themes", t)}>{t}</a></li>)}
             {d.setting.map((x) => <li><a href={tagHref("setting", x)}>{x}</a></li>)}
             {d.status !== "produced" && <li><a href={tagHref("status", d.status)}>{d.status}</a></li>}
             {d.producedByNist && <li><a href="/work/?nist=1">Produced by Nist</a></li>}
@@ -284,6 +286,7 @@ if (onward.length === 0 && all.length > 1) {
   /* 4. Strapline and prose */
   .strap { margin-bottom: var(--s-8); }
   .lead { font-size: clamp(1.25rem, 2vw, 1.5rem); font-weight: 600; max-width: var(--measure); margin-bottom: var(--s-8); }
+  .access-note { max-width: var(--measure); padding: var(--s-3) var(--s-4); background: var(--paper); border-left: 4px solid var(--ink); }
   .prose { max-width: var(--measure); }
   /* On desktop the prose runs in two columns like a freesheet; headings stay with their text */
   @media (min-width: 900px) {

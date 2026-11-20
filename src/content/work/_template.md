@@ -21,8 +21,14 @@ setting: ["live"]
 # status: touring
 
 # THREADS. Up to two. Use the file names in src/content/threads/ (without .md).
-# Current: archives-and-officialdom · puppets-and-objects · iran-and-the-diaspora · access-led-making
+# Current: archives-and-officialdom · diasporic
 thread: []
+
+# THEMES. What it is about. Any number. Current list: Iran (add new words in src/content.config.ts and Notion together).
+# themes: ["Iran"]
+
+# ACCESS. A sentence or two on what access is part of this work. Shown on its page and gathered on /access.
+# access: ""
 
 featured: false            # true = appears in the curated row at the top of Work and on the homepage
 producedByNist: false      # true = "Produced by Nist" in the facts line and on the Nist page

@@ -1,6 +1,10 @@
 ---
 // Access statement (plan step 9, design.md section 8). PLACEHOLDER sections to confirm at launch.
+// 20 Nov 2026: also gathers what each work says about its own access ("Access in the work"),
+// from the `access` field on work entries. The section appears once any work has one.
+import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
+const withAccess = (await getCollection("work")).filter((e) => e.data.access).sort((a, b) => b.data.year - a.data.year);
 const reviewed = new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" });
 ---
 
@@ -26,5 +30,27 @@ const reviewed = new Date().toLocaleDateString("en-GB", { month: "long", year: "
         <p class="mono">Last reviewed: {reviewed}</p>
       </div>
     </section>
+
+    {withAccess.length > 0 && (
+      <section data-theme="light" class="section" id="in-the-work">
+        <div class="wrap">
+          <h2>Access in the work</h2>
+          <ul class="works" role="list">
+            {withAccess.map((e) => (
+              <li>
+                <h3><a href={`/work/${e.id}/`}>{e.data.title}</a></h3>
+                <p>{e.data.access}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
   </main>
 </Base>
+
+<style>
+  .works { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-6); }
+  .works h3 { margin: 0 0 var(--s-2); }
+  h2 { margin-top: 0; }
+</style>

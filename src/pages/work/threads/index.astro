@@ -107,7 +107,7 @@ const border = (dash: string) => (dash === "" ? "solid" : dash.startsWith("2 ") 
         {lines.map((l) => (
           <section class="strand" style={`--thread: ${l.style.colour}; --line: ${border(l.style.dash)}`}>
             <h3 class="strand__title"><a href={`/work/threads/${l.id}/`}>{l.title}</a></h3>
-            <p class="mono strand__meta">{l.n} {l.n === 1 ? "work" : "works"}{l.placeholder && " · working title"}</p>
+            <p class="mono strand__meta">{l.n} {l.n === 1 ? "work" : "works"}</p>
             <ol class="strand__works" role="list">
               {worksOn(l.id).map((e, i) => {
                 const t = splitTitle(e.data.title);

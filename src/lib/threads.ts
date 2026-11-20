@@ -14,7 +14,7 @@ export const THREAD_STYLES = [
 export const threadStyle = (index: number) => THREAD_STYLES[index % THREAD_STYLES.length];
 
 // Where a tag link goes: the catalogue, filtered to that word.
-export const tagHref = (group: "role" | "medium" | "setting" | "status", value: string) =>
+export const tagHref = (group: "role" | "medium" | "setting" | "status" | "themes", value: string) =>
   `/work/?${group}=${encodeURIComponent(value)}`;
 
 export const years = (d: { year: number; endYear?: number }) =>

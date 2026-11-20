@@ -5,7 +5,7 @@ role: ["lead artist", "co-creator", "performer", "writer"]
 medium: ["installation", "theatre", "film"]
 setting: ["live", "gallery"]
 status: produced
-thread: ["archives-and-officialdom", "access-led-making"]
+thread: ["archives-and-officialdom"]
 featured: true
 with: "Matthew Robinson"
 venue: "The Pit, Barbican Centre (CRIPtic Arts: The Acts); APT Gallery, London"
@@ -23,7 +23,7 @@ connected: []
 
 Apolune: Systems Normal takes NASA's Apollo 11 archive and reworks it as a performance environment, co-created with the visual artist and filmmaker Matthew Robinson. Mission transcripts become the script. Archive footage runs into live camera feeds. Projection mapping borrows the look of 1960s broadcast technology, so the room feels like a control centre that has been left on too long.
 
-Underneath the heroic story of progress there is something smaller: isolation, distance, overwhelm, and two neurodivergent artists putting their own personal archives next to the official one. The piece is built around multi-sensory entry points, with BSL performance and audio description written in from the start rather than added at the end.
+Underneath the heroic story of progress there is something smaller: isolation, distance, overwhelm, and two neurodivergent artists putting their own personal archives next to the official one. The piece is built around multi-sensory entry points.
 
 It began under the working title Over The Moon, as a 20-minute piece for CRIPtic Arts' Launchpad programme, and played two sold-out showings in The Pit at the Barbican in November 2024. Arts Council England funded the next stage of research and development, with support from Tamasha, Bow Arts and the Oppenheim-John Downes Memorial Trust. It was shown at Bow Arts' Soho Artists Takeover and had its exhibition premiere at APT Gallery, London, in 2026.
 

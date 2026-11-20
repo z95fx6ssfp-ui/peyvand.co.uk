@@ -33,6 +33,11 @@ export const MEDIA = [
 
 export const SETTINGS = ["live", "recorded", "outdoor", "online", "gallery"] as const;
 
+// Themes (20 Nov 2026): what a work is about. An open list: add a word here and in Notion
+// (Website: WORKS, "Themes") at the same time. Iran was a thread and Peyvand moved it here:
+// a thread is a way of looking that runs across work ("Diasporic"); a theme is a subject.
+export const THEMES = ["Iran"] as const;
+
 export const STATUSES = ["R&D", "in development", "produced", "touring", "archived"] as const;
 
 const roleValues = [...ROLES.Performer, ...ROLES.Maker] as const;
@@ -52,6 +57,7 @@ const work = defineCollection({
       medium: z.array(z.enum(MEDIA)).min(1),
       setting: z.array(z.enum(SETTINGS)).min(1),
       status: z.enum(STATUSES).default("produced"),
+      themes: z.array(z.enum(THEMES)).default([]),
       thread: z.array(reference("threads")).max(2).default([]),
       featured: z.boolean().default(false),
       producedByNist: z.boolean().default(false),
@@ -62,6 +68,7 @@ const work = defineCollection({
       with: z.string().optional(), // collaborators, replaces a "collaborator" tag
       director: z.string().optional(),
       funders: z.array(z.string()).default([]), // credited on the entry page and the Nist page
+      access: z.string().optional(), // what access is part of this work, a sentence or two; shown on its page and gathered on /access
       summary: z.string().max(200),
       image: image().optional(),
       imageAlt: z.string().optional(),

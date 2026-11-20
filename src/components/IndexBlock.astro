@@ -4,7 +4,7 @@
 // a tag filters the catalogue in place; thread names go to that thread's page.
 // Counts come from the entries at build time; tags no work carries are left out.
 import type { CollectionEntry } from "astro:content";
-import { ROLES, MEDIA, SETTINGS, STATUSES } from "../content.config";
+import { ROLES, MEDIA, SETTINGS, STATUSES, THEMES } from "../content.config";
 import { tagHref } from "../lib/threads";
 
 interface Props {
@@ -24,6 +24,7 @@ const groups: { title: string; group: string; items: Item[] }[] = [
     items: [...ROLES.Performer, ...ROLES.Maker].map((v) => ({ value: v, label: v, n: count((e) => e.data.role, v), href: tagHref("role", v) })),
   },
   { title: "Medium", group: "medium", items: MEDIA.map((v) => ({ value: v, label: v, n: count((e) => e.data.medium, v), href: tagHref("medium", v) })) },
+  { title: "Themes", group: "themes", items: THEMES.map((v) => ({ value: v, label: v, n: count((e) => e.data.themes, v), href: tagHref("themes", v) })) },
   { title: "Setting", group: "setting", items: SETTINGS.map((v) => ({ value: v, label: v, n: count((e) => e.data.setting, v), href: tagHref("setting", v) })) },
   { title: "Status", group: "status", items: STATUSES.map((v) => ({ value: v, label: v, n: count((e) => [e.data.status], v), href: tagHref("status", v) })) },
   {
@@ -60,7 +61,7 @@ const groups: { title: string; group: string; items: Item[] }[] = [
   .index__title { margin: 0 0 var(--s-2); font-size: clamp(2.5rem, 7vw, 5rem); line-height: 0.95; color: var(--saffron); }
   .index__lead { margin: 0 0 var(--s-8); }
   .index__cols { display: grid; gap: var(--s-8) var(--grid-gap); grid-template-columns: repeat(2, 1fr); }
-  @media (min-width: 900px) { .index__cols { grid-template-columns: repeat(5, 1fr); } }
+  @media (min-width: 900px) { .index__cols { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); } }
   .index__heading { font-size: 0.875rem; margin: 0 0 var(--s-3); font-weight: 700; letter-spacing: 0; opacity: 0.85; }
   .index ul { list-style: none; margin: 0; padding: 0; }
   .index li { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-3); border-bottom: 1px dotted currentColor; max-width: none; }

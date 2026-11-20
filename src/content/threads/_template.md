@@ -2,7 +2,7 @@
 # Copy this file, name it with the thread's slug (lower case, hyphens), fill in, delete this comment.
 title: "Thread name as it appears on the site"
 order: 5                  # position in the Threads band and index, lowest first
-placeholder: false        # true shows a "working title" note on the page
+placeholder: false        # true = your text for it is still to come (the page says so and shows no text)
 image: "../../assets/work/placeholder.png"   # a photograph from one of the works in the thread
 imageAlt: "One sentence describing the picture."
 ---

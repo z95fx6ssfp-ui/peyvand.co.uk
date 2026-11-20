@@ -27,8 +27,9 @@ const others = allThreads.filter((t) => t.id !== thread.id);
       <div class="wrap">
         <p class="mono crumb"><a href="/work/threads/">Threads</a></p>
         <h1 class="display settle">{thread.data.title}</h1>
-        {thread.data.placeholder && <p class="mono note">Working title. Peyvand's own name and words for this thread are still to come.</p>}
-        <div class="prose lead"><Content /></div>
+        {thread.data.placeholder
+          ? <p class="mono note">Peyvand's words on this thread are still to come.</p>
+          : <div class="prose lead"><Content /></div>}
         <p class="mono count">{work.length} {work.length === 1 ? "work" : "works"}, oldest first</p>
       </div>
     </section>

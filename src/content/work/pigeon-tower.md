@@ -5,7 +5,8 @@ role: ["lead artist"]
 medium: ["installation", "audio"]
 setting: ["gallery"]
 status: produced
-thread: ["iran-and-the-diaspora", "archives-and-officialdom"]
+thread: ["diasporic", "archives-and-officialdom"]
+themes: ["Iran"]
 featured: true
 venue: "LCB Depot, Leicester, for Journeys Festival International"
 company: "Commissioned by Art Reach"
